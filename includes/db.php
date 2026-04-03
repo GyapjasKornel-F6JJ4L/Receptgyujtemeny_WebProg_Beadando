@@ -6,7 +6,7 @@ class Database
     private $db = "receptgyűjtemény";
     private $user = "root";
     private $password = "";
-    private $charset = "utf8mb4"; // Mindig mb4-et használjunk az ékezetek miatt
+    private $charset = "utf8mb4"; 
 
     protected function connect()
     {
