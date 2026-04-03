@@ -1,88 +1,63 @@
-<!DOCTYPE html>
-<html lang="hu">
-
-<head>
-    <meta charset="UTF-8">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Receptgyűjtemény SPA + OOP + JSON</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            background: #f4f4f4;
-            padding: 20px;
-            color: #333;
-        }
-
-        .status {
-            color: green;
-            font-weight: bold;
-        }
-
-        /* Alap formázások az űrlapokhoz és kártyákhoz */
-        .container {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            max-width: 400px;
-            margin: 20px auto;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        input {
-            display: block;
-            width: 100%;
-            margin-bottom: 15px;
-            padding: 10px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        button {
-            padding: 10px 15px;
-            cursor: pointer;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            width: 100%;
-            font-size: 16px;
-        }
-
-        button:hover {
-            background: #218838;
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fff;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        nav button {
-            width: auto;
-            background: #dc3545;
-        }
-        
-        nav button:hover {
-            background: #c82333;
-        }
-    </style>
-</head>
-
-<body>
-    <h1>Receptgyűjtemény</h1>
-
-    <?php
-    echo "<p class='status'>Szerver állapota: Online (" . date("Y-m-d H:i") . ")</p>";
-    ?>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+<link rel="stylesheet" href="assets/css/style.css">
+  </head>
+  <body>
+    <header class="p-3 mb-4">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      
+      <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="/docs/5.3/assets/brand/bootstrap-logo.svg" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+        Receptgyűjtemény
+      </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#home">Kezdőlap</a>
+            </li>
+          </ul>
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0 auth-links">
+              <!-- Bejelentkezés link mindig látható alapértelmezetten -->
+              <li class="nav-item">
+                <a class="nav-link" href="#login" id="login-link">Bejelentkezés</a>
+              </li>
+              <!-- Profil dropdown csak akkor látható, ha be vagyunk jelentkezve -->
+              <li class="nav-item dropdown d-none" id="profile-dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Profil
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#add-recipe">Új recept feltöltés</a></li>
+                  <li><a class="dropdown-item" href="#my-recipes">Receptjeim</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="#" id="logout-link">Kijelentkezés</a></li>
+                </ul>
+              </li>
+            </ul>
+          
+        </div>
+      </div>
+    </nav>
+    <nav class="search-nav">
+      <form class="d-flex" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+          </form>
+      </nav>
+    </header>
 
     <main id="app"></main>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script src="assets/js/api.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/ui.js"></script>

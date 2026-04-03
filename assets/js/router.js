@@ -1,70 +1,70 @@
+// A Router felelős a hash-alapú útválasztásért.
+// Hash-routing: #home, #login, #register, #add-recipe, #recipe/:id
+// Ez a modul figyeli a hash-changes és load eseményeket, majd a megfelelő UI.render* függvényeket hívja meg.
 const Router = {
-    // Ez indul el legelőször, amikor betölt az oldal
-    init: () => {
-        // Figyeljük, ha a felhasználó kattint egy linkre (megváltozik a hash)
-        window.addEventListener('hashchange', Router.handleRoute);
-        // Akkor is lefut, amikor először betöltjük (frissítjük) az oldalt
-        window.addEventListener('load', Router.handleRoute);
+    // Egyszerű route térkép: path -> UI függvény
+    routes: {
+        home: UI.renderHome,
+        login: UI.renderLogin,
+        register: UI.renderRegister,
+        'add-recipe': UI.renderAddRecipe,
+        'my-recipes': UI.renderMyRecipes,
     },
 
-    // Ez a függvény dönti el, hova megyünk
+    // init(): elindítja a hashfigyelést és egyszerre frissíti a navbar státuszt.
+    init: () => {
+        window.addEventListener('hashchange', Router.handleRoute);
+        window.addEventListener('load', Router.handleRoute);
+        Auth.updateNavbar();
+    },
+
+    // hash értelmezése egyszerű útvonalnévként (paraméterek nélkül)
+    parseHash: (hash) => {
+        if (!hash || hash === '#') return 'home';
+
+        // #recipe/12 jelzésével külön kezeljük a detaily route-ot
+        if (hash.startsWith('#recipe/')) return 'recipe';
+
+        return hash.slice(1);
+    },
+
+    // Fő útvonalkezelő: ellenőrzi bejelentkezési állapotot és kiadja a nézetnek a renderelést.
     handleRoute: () => {
-        let hash = window.location.hash;
-
-        // Ha nincs hash (pl. csak simán a főoldalra jött a user), küldjük a loginra
-        if (!hash) {
-            window.location.hash = '#login';
-            return; // A hash megváltoztatása újra meghívja ezt a függvényt
-        }
-
-        // --- BIZTONSÁGI ELLENŐRZÉS ---
+        const hash = window.location.hash;
+        const route = Router.parseHash(hash);
         const isLoggedIn = Auth.isLoggedIn();
 
-        // Ha nincs belépve, és nem is a login/register oldalon van -> irány a login!
-        if (!isLoggedIn && hash !== '#login' && hash !== '#register') {
+        if (route === 'home') {
+            window.location.hash = '#home';
+        }
+
+        // Vendég: receptlista, részletek, login/register; egyéb (pl. saját receptek) → bejelentkezés
+        if (!isLoggedIn && !['home', 'login', 'register', 'recipe'].includes(route)) {
             window.location.hash = '#login';
             return;
         }
 
-        // Ha már be van lépve, de a login/register oldalra tévedne -> irány a főoldal!
-        if (isLoggedIn && (hash === '#login' || hash === '#register')) {
+        if (isLoggedIn && ['login', 'register'].includes(route)) {
             window.location.hash = '#home';
             return;
         }
 
-        // --- ÚTVONALAK (ROUTING) ---
-        if (hash === '#login') {
-            UI.renderLogin();
-        } 
-        else if (hash === '#register') {
-            UI.renderRegister(); 
-        } 
-        else if (hash === '#home') {
-            UI.renderHome(); 
-        } 
-        // ÚJ: Új recept hozzáadása nézet
-        else if (hash === '#add-recipe') {
-            UI.renderAddRecipe(); 
-        }
-        // FRISSÍTVE: Recept részletei
-        else if (hash.startsWith('#recipe/')) {
-            // Kinyerjük az ID-t a hash-ből (pl. "#recipe/5" -> "5")
+        // #recipe/:id esetében dinamikus ID-vel hívjuk a detail nézetet.
+        if (route === 'recipe') {
             const recipeId = hash.split('/')[1];
-            // Most már élesben hívjuk a UI réteget!
-            UI.renderRecipeDetails(recipeId); 
-        } 
-        else {
-            // Ha ismeretlen helyre ment
-            UI.appContainer.innerHTML = `
-                <div class="container" style="text-align: center;">
-                    <h2>404 - Az oldal nem található</h2>
-                    <br>
-                    <a href="#home" style="display:inline-block; padding:10px; background:#28a745; color:white; text-decoration:none; border-radius:4px;">Vissza a főoldalra</a>
-                </div>
-            `;
+            UI.renderRecipeDetails(recipeId);
+            return;
         }
-    }
+
+        // Ha route megtalálható a routes mapben, renderelni kell.
+        const view = Router.routes[route];
+        if (view) {
+            view();
+            return;
+        }
+
+        UI.appContainer.innerHTML = `\n            <div class="container text-center py-5">\n                <h2>404 - Az oldal nem található</h2>\n                <a href="#home" class="btn btn-primary mt-3">Vissza a főoldalra</a>\n            </div>\n        `;
+    },
 };
 
-// Indítjuk a routert!
 Router.init();

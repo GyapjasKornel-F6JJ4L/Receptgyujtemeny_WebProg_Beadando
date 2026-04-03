@@ -1,0 +1,220 @@
+/* Modernizált stílusok a receptgyűjtemény oldalhoz */
+/* Frissített body: Modernabb háttér gradient-tel és jobb tipográfia */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modernabb font család */
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Finom gradient háttér */
+    padding: 20px;
+    color: #333;
+    min-height: 100vh; /* Teljes magasságú háttér */
+    margin: 0; /* Eltávolítjuk az alap margót */
+}
+
+/* Státusz üzenetek frissítése: Jobb szín és stílus */
+.status {
+    color: #28a745; /* Zöld szín sikerhez */
+    font-weight: bold;
+    background: rgba(40, 167, 69, 0.1); /* Halvány háttér */
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+/* App kártya stílus login/home tartalomhoz */
+.app-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 900px;
+    margin: 20px auto;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease;
+}
+
+.app-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Input mezők modernizálása: Focus állapot és jobb stílus */
+input {
+    display: block;
+    width: 100%;
+    margin-bottom: 20px; /* Növelt margin */
+    padding: 12px; /* Növelt padding */
+    box-sizing: border-box;
+    border: 2px solid #e1e5e9; /* Vastagabb border */
+    border-radius: 8px; /* Kerekítés */
+    font-size: 16px;
+    transition: border-color 0.3s ease; /* Animáció */
+}
+
+input:focus {
+    outline: none;
+    border-color: #007bff; /* Kék focus szín */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Finom glow */
+}
+
+/* Gombok frissítése: Modernabb színek és hover effektusok */
+button, .btn, .btn-primary, .btn-success, .btn-outline-success, .btn-outline-primary, .nav-link.logout-style, .login-link {
+    padding: 10px 20px;
+    cursor: pointer;
+    background: linear-gradient(45deg, #28a745, #20c997); /* Gradient háttér */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+button:hover, .btn:hover, .nav-link.logout-style:hover, .login-link:hover {
+    background: linear-gradient(45deg, #218838, #17a2b8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Keresésgombhoz hasonló semleges, de a login mindig kiemelt */
+.btn-outline-success,
+.login-link {
+    border: 1px solid #28a745;
+    color: #28a745 !important;
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.btn-outline-success:hover,
+.login-link:hover {
+    background: #28a745;
+    color: white !important;
+}
+
+.navbar .nav-link {
+    margin-left: 8px;
+    margin-right: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.navbar .nav-link:hover {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #155724 !important;
+}
+
+/* Navigáció frissítése: Jobb háttér és stílus */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.9); /* Átlátszó fehér */
+    padding: 20px; /* Növelt padding */
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px); /* Blur effektus modern böngészőkben */
+}
+
+.search-nav {
+    background: rgba(255, 255, 255, 0.92);
+    position: relative;
+    top: 0;
+    z-index: 900;
+    margin: 0 auto 20px;
+    padding: 12px 20px;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    align-items: center;
+    max-width: 900px;
+    width: 100%;
+}
+
+/* A fő navbar a kereső alá kerülő nav előtt legyen */
+header > .navbar {
+    position: relative;
+    z-index: 1000;
+    justify-content: center;
+}
+
+.search-nav input {
+    max-width: 100%;
+    margin-left: auto;
+}
+
+/* Dropdown menü mindig látható elöl, ne takarja a keresősáv */
+.dropdown-menu {
+    position: absolute !important;
+    z-index: 2050 !important;
+}
+
+.navbar .dropdown-menu {
+    z-index: 2050 !important;
+}
+
+/* Dropdown háttér a jobb láthatóságért */
+.dropdown-menu {
+    background: white;
+}
+
+/* Hamburger ne legyen piros */
+.navbar-toggler {
+    background: transparent !important;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.navbar-toggler-icon {
+    filter: none !important;
+}
+
+
+/* Nav gombok külön kezelése: Piros szín a kereséshez */
+nav button {
+    width: auto;
+    background: linear-gradient(45deg, #dc3545, #fd7e14); /* Piros-narancs gradient */
+    margin-left: 10px;
+}
+
+nav button:hover {
+    background: linear-gradient(45deg, #c82333, #e8590c); /* Sötétebb hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Kijelentkezés link kezelése: Csak akkor látható, ha be vagyunk jelentkezve */
+/* Ez a CSS-ben alapértelmezetten rejtett, a JS (auth.js vagy ui.js) mutatja meg, amikor szükséges */
+/* Nincs szükség változtatásra itt, mivel a Bootstrap d-none osztály kezeli */
+
+/* További modern elemek: Reszponzív design */
+@media (max-width: 768px) {
+    .container {
+        margin: 10px;
+        padding: 20px;
+    }
+    nav {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .navbar-nav {
+        width: 100%;
+        justify-content: center;
+    }
+    .navbar-nav .nav-item {
+        text-align: center;
+        width: 100%;
+    }
+    .navbar-nav .nav-link {
+        width: 100%;
+    }
+    .navbar-toggler {
+        background: transparent !important;
+        box-shadow: none;
+    }
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%280, 0, 0, 0.7%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+    }
+    nav button {
+        margin-top: 10px;
+        margin-left: 0;
+    }
+}

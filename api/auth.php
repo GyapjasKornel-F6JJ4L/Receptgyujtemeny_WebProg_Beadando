@@ -10,13 +10,14 @@ try {
     $action = $request['action'] ?? '';
     $username = $request['username'] ?? '';
     $password = $request['password'] ?? '';
+    $email = $request['email'] ?? null;
 
     if (empty($username) || empty($password)) {
         throw new Exception("Minden mezőt ki kell tölteni!");
     }
 
     if ($action === 'register') {
-        $result = $queryManager->registerUser($username, $password);
+        $result = $queryManager->registerUser($username, $password, $email);
         echo json_encode($result);
     } 
     elseif ($action === 'login') {

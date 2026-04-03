@@ -1,4 +1,22 @@
+// Auth modul: bejelentkezés/logout állapotkezelés és navbar frissítés.
+// localStorage-ben tárolja a user-t, hogy a refresh után ne kelljen újra bejelentkezni.
 const Auth = {
+    // Navigációs menü frissítése a bejelentkezési feltétel alapján.
+    // Ha belépett, elrejti a belépés linket és megjeleníti a profil/dropdown menüt.
+    updateNavbar: () => {
+        const isLoggedIn = Auth.isLoggedIn();
+        const loginLink = document.getElementById('login-link');
+        const profileDropdown = document.getElementById('profile-dropdown');
+
+        if (isLoggedIn) {
+            if (loginLink) loginLink.parentElement.classList.add('d-none');
+            if (profileDropdown) profileDropdown.classList.remove('d-none');
+        } else {
+            if (loginLink) loginLink.parentElement.classList.remove('d-none');
+            if (profileDropdown) profileDropdown.classList.add('d-none');
+        }
+    },
+
     // Bejelentkezett felhasználó adatainak lekérése
     getUser: () => {
         return JSON.parse(localStorage.getItem('user')) || null;
@@ -11,30 +29,56 @@ const Auth = {
     // Kijelentkezés
     logout: () => {
         localStorage.removeItem('user');
-        window.location.hash = '#login'; // Visszairányítás a login oldalra
+        Auth.updateNavbar();
+        window.location.hash = '#home';
     },
 
-    // Bejelentkezés küldése az API-nak
+    // Bejelentkezés funkció
+    // Bejelentkezés (backend hívása az api/auth.php-nek)
+    // Sikeres bejelentkezés esetén localStorage-be írjuk a felhasználót.
     login: async (username, password) => {
+        if (!username || !password) {
+            alert('Kérlek, töltsd ki a felhasználónév/jelszó mezőket.');
+            return;
+        }
+
         try {
-            const response = await fetch('api/auth.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'login', username, password })
-            });
-            
-            const data = await response.json();
-            
-            if (response.ok && data.success) {
-                // Sikeres belépés: mentsük el az adatokat!
-                localStorage.setItem('user', JSON.stringify(data.user));
-                alert(`Üdvözlünk, ${data.user.username}!`);
-                window.location.hash = '#home'; // Tovább az ista oldalra
+            const result = await Api.call('login', { username, password }, 'auth');
+            if (result.success) {
+                localStorage.setItem('user', JSON.stringify(result.user));
+                alert(`Üdvözöljük, ${result.user.username}!`);
+                Auth.updateNavbar();
+                window.location.hash = '#home';
             } else {
-                alert("Hiba: " + data.error);
+                alert(result.error || 'Hiba történt a bejelentkezésnél.');
             }
         } catch (error) {
-            console.error("Hálózati hiba:", error);
+            console.error('Auth hiba:', error);
+            alert('Szerverhiba történt, próbáld újra később.');
         }
-    }
+    },
+
+    register: async (username, password, email = null) => {
+        if (!username || !password) {
+            alert('Add meg a felhasználónevet és jelszót a regisztrációhoz.');
+            return;
+        }
+
+        try {
+            const result = await Api.call('register', { username, password, email }, 'auth');
+            if (result.success) {
+                alert('Sikeres regisztráció! Most bejelentkezhetsz.');
+                window.location.hash = '#login';
+            } else {
+                alert(result.error || 'Regisztráció sikertelen.');
+            }
+        } catch (error) {
+            console.error('Regisztrációs hiba:', error);
+            alert('Szerverhiba történt a regisztrációnál.');
+        }
+    },
+
 };
+
+// Auth API-k használata az Api modulon keresztül
+// A login/register műveletek így átláthatóan a Api.call() központi logikát használják.

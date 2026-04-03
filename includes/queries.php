@@ -4,17 +4,37 @@ require_once 'db.php';
 
 class queries extends Database
 {
-    // 1. Összes recept lekérése (id-vel együtt!)
+    // 1. Összes recept lekérése (lista / kártya mezők)
     public function get_receipeName()
     {
         $pdo = $this->connect();
-        $sql = $pdo->prepare("SELECT id, title FROM recipes");
+        $sql = $pdo->prepare(
+            "SELECT r.id, r.title, r.description, r.image, c.name AS type
+             FROM recipes r
+             LEFT JOIN categories c ON r.category_id = c.id
+             ORDER BY r.id"
+        );
         $sql->execute();
-        return $sql->fetchAll();
+        return $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // 1b. Egy felhasználó receptjei
+    public function get_recipes_by_user_id($userId)
+    {
+        $pdo = $this->connect();
+        $sql = $pdo->prepare(
+            "SELECT r.id, r.title, r.description, r.image, c.name AS type
+             FROM recipes r
+             LEFT JOIN categories c ON r.category_id = c.id
+             WHERE r.user_id = ?
+             ORDER BY r.id"
+        );
+        $sql->execute([(int) $userId]);
+        return $sql->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // 2. Regisztráció
-    public function registerUser($username, $password) {
+    public function registerUser($username, $password, $email = null) {
         $pdo = $this->connect();
         
         // Ellenőrizzük, létezik-e már a felhasználónév
@@ -24,12 +44,18 @@ class queries extends Database
             throw new Exception("Ez a felhasználónév már foglalt!");
         }
 
-        // Jelszó titkosítása
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        // Email ellenőrzés, ha meg van adva
+        if ($email) {
+            $emailCheck = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+            $emailCheck->execute([$email]);
+            if ($emailCheck->rowCount() > 0) {
+                throw new Exception("Ez az email cím már használatban van!");
+            }
+        }
         
         // Új felhasználó beszúrása
-        $sql = $pdo->prepare("INSERT INTO users (username, password_hash) VALUES (?, ?)");
-        $sql->execute([$username, $hashedPassword]);
+        $sql = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
+        $sql->execute([$username, $email, $password]);
         
         return ["success" => true, "message" => "Sikeres regisztráció!"];
     }
@@ -38,12 +64,12 @@ class queries extends Database
     public function loginUser($username, $password) {
         $pdo = $this->connect();
         
-        $sql = $pdo->prepare("SELECT id, username, password_hash FROM users WHERE username = ?");
+        $sql = $pdo->prepare("SELECT id, username, password FROM users WHERE username = ?");
         $sql->execute([$username]);
         $user = $sql->fetch();
 
-        // Jelszó ellenőrzése a titkosított hash alapján
-        if ($user && password_verify($password, $user['password_hash'])) {
+        // Jelszó ellenőrzése
+        if ($user && $user['password'] === $password) {
             return [
                 "success" => true, 
                 "user" => [
@@ -71,6 +97,18 @@ class queries extends Database
             "message" => "Recept sikeresen hozzáadva!",
             "recipe_id" => $pdo->lastInsertId()
         ];
+    }
+
+    // 5. Recept részleteinek lekérése
+    public function get_recipe_details($id) {
+        $pdo = $this->connect();
+        
+        $sql = $pdo->prepare("SELECT r.*, c.name as category, u.username as author FROM recipes r 
+                              LEFT JOIN categories c ON r.category_id = c.id 
+                              LEFT JOIN users u ON r.user_id = u.id 
+                              WHERE r.id = ?");
+        $sql->execute([$id]);
+        return $sql->fetch();
     }
 }
 ?>
