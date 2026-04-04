@@ -218,3 +218,68 @@ nav button:hover {
         margin-left: 0;
     }
 }
+
+/* --- RECEPT KÁRTYÁK STÍLUSA --- */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none !important;
+    border-radius: 15px !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    background: #ffffff;
+}
+
+/* Amikor ráviszed az egeret */
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-title {
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+/* --- ŰRLAP MEZŐK --- */
+.form-control {
+    border-radius: 10px !important;
+    border: 2px solid #e2e8f0;
+    padding: 12px 15px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+/* Amikor belekattint a felhasználó */
+.form-control:focus {
+    border-color: #ff6b6b; /* Finom pirosas-narancsos étel szín */
+    box-shadow: 0 0 0 0.25rem rgba(255, 107, 107, 0.25) !important;
+    background-color: #fffaf9;
+}
+
+/* --- GOMBOK --- */
+.btn-primary {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 12px 20px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+/* Gomb hover effekt */
+.btn-primary:hover {
+    transform: scale(1.03);
+    box-shadow: 0 8px 15px rgba(238, 82, 83, 0.4);
+}
+
+/* --- BEJELENTKEZŐ / REGISZTRÁCIÓS KÁRTYA --- */
+.app-card {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(12px); /* Homályosítja a mögötte lévő dolgokat */
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
