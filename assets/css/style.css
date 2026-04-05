@@ -1,285 +1,117 @@
-/* Modernizált stílusok a receptgyűjtemény oldalhoz */
-/* Frissített body: Modernabb háttér gradient-tel és jobb tipográfia */
+/* --- ALAPVETŐ STÍLUSOK ÉS HÁTTÉR --- */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modernabb font család */
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Finom gradient háttér */
-    padding: 20px;
-    color: #333;
-    min-height: 100vh; /* Teljes magasságú háttér */
-    margin: 0; /* Eltávolítjuk az alap margót */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #eef2f6; /* A képeken látható finom szürkéskék háttér */
+    min-height: 100vh;
+    margin: 0;
+    padding-bottom: 50px;
+    color: #334155;
 }
 
-/* Státusz üzenetek frissítése: Jobb szín és stílus */
-.status {
-    color: #28a745; /* Zöld szín sikerhez */
-    font-weight: bold;
-    background: rgba(40, 167, 69, 0.1); /* Halvány háttér */
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-}
-
-/* App kártya stílus login/home tartalomhoz */
+/* --- KÁRTYÁK (CARDS) --- */
 .app-card {
-    background: white;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
     padding: 30px;
-    border-radius: 15px;
-    max-width: 900px;
-    margin: 20px auto;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    transition: transform 0.3s ease;
+    border: none;
 }
 
-.app-card:hover {
-    transform: translateY(-5px);
+.recipe-card {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: #ffffff;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Input mezők modernizálása: Focus állapot és jobb stílus */
-input {
-    display: block;
+.recipe-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.recipe-card img {
+    height: 220px;
+    object-fit: cover;
     width: 100%;
-    margin-bottom: 20px; /* Növelt margin */
-    padding: 12px; /* Növelt padding */
-    box-sizing: border-box;
-    border: 2px solid #e1e5e9; /* Vastagabb border */
-    border-radius: 8px; /* Kerekítés */
-    font-size: 16px;
-    transition: border-color 0.3s ease; /* Animáció */
 }
 
-input:focus {
-    outline: none;
-    border-color: #007bff; /* Kék focus szín */
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Finom glow */
-}
-
-/* Gombok frissítése: Modernabb színek és hover effektusok */
-button, .btn, .btn-primary, .btn-success, .btn-outline-success, .btn-outline-primary, .nav-link.logout-style, .login-link {
-    padding: 10px 20px;
-    cursor: pointer;
-    background: linear-gradient(45deg, #28a745, #20c997); /* Gradient háttér */
-    color: white;
+/* --- GOMBOK --- */
+.btn-gradient {
+    background: linear-gradient(90deg, #7b2cbf 0%, #1d4ed8 100%);
+    color: white !important;
     border: none;
     border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-button:hover, .btn:hover, .nav-link.logout-style:hover, .login-link:hover {
-    background: linear-gradient(45deg, #218838, #17a2b8);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Keresésgombhoz hasonló semleges, de a login mindig kiemelt */
-.btn-outline-success,
-.login-link {
-    border: 1px solid #28a745;
-    color: #28a745 !important;
-    background: rgba(40, 167, 69, 0.1);
-}
-
-.btn-outline-success:hover,
-.login-link:hover {
-    background: #28a745;
-    color: white !important;
-}
-
-.navbar .nav-link {
-    margin-left: 8px;
-    margin-right: 8px;
-    padding: 8px 12px;
-    border-radius: 6px;
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.navbar .nav-link:hover {
-    background-color: rgba(40, 167, 69, 0.2);
-    color: #155724 !important;
-}
-
-/* Navigáció frissítése: Jobb háttér és stílus */
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.9); /* Átlátszó fehér */
-    padding: 20px; /* Növelt padding */
-    border-radius: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px); /* Blur effektus modern böngészőkben */
-}
-
-.search-nav {
-    background: rgba(255, 255, 255, 0.92);
-    position: relative;
-    top: 0;
-    z-index: 900;
-    margin: 0 auto 20px;
-    padding: 12px 20px;
-    border-radius: 0 0 12px 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    align-items: center;
-    max-width: 900px;
-    width: 100%;
-}
-
-/* A fő navbar a kereső alá kerülő nav előtt legyen */
-header > .navbar {
-    position: relative;
-    z-index: 1000;
-    justify-content: center;
-}
-
-.search-nav input {
-    max-width: 100%;
-    margin-left: auto;
-}
-
-/* Dropdown menü mindig látható elöl, ne takarja a keresősáv */
-.dropdown-menu {
-    position: absolute !important;
-    z-index: 2050 !important;
-}
-
-.navbar .dropdown-menu {
-    z-index: 2050 !important;
-}
-
-/* Dropdown háttér a jobb láthatóságért */
-.dropdown-menu {
-    background: white;
-}
-
-/* Hamburger ne legyen piros */
-.navbar-toggler {
-    background: transparent !important;
-    border-color: rgba(0, 0, 0, 0.1);
-}
-
-.navbar-toggler-icon {
-    filter: none !important;
-}
-
-
-/* Nav gombok külön kezelése: Piros szín a kereséshez */
-nav button {
-    width: auto;
-    background: linear-gradient(45deg, #dc3545, #fd7e14); /* Piros-narancs gradient */
-    margin-left: 10px;
-}
-
-nav button:hover {
-    background: linear-gradient(45deg, #c82333, #e8590c); /* Sötétebb hover */
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Kijelentkezés link kezelése: Csak akkor látható, ha be vagyunk jelentkezve */
-/* Ez a CSS-ben alapértelmezetten rejtett, a JS (auth.js vagy ui.js) mutatja meg, amikor szükséges */
-/* Nincs szükség változtatásra itt, mivel a Bootstrap d-none osztály kezeli */
-
-/* További modern elemek: Reszponzív design */
-@media (max-width: 768px) {
-    .container {
-        margin: 10px;
-        padding: 20px;
-    }
-    nav {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .navbar-nav {
-        width: 100%;
-        justify-content: center;
-    }
-    .navbar-nav .nav-item {
-        text-align: center;
-        width: 100%;
-    }
-    .navbar-nav .nav-link {
-        width: 100%;
-    }
-    .navbar-toggler {
-        background: transparent !important;
-        box-shadow: none;
-    }
-    .navbar-toggler-icon {
-        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%280, 0, 0, 0.7%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
-    }
-    nav button {
-        margin-top: 10px;
-        margin-left: 0;
-    }
-}
-
-/* --- RECEPT KÁRTYÁK STÍLUSA --- */
-.card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: none !important;
-    border-radius: 15px !important;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-    background: #ffffff;
-}
-
-/* Amikor ráviszed az egeret */
-.card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
-}
-
-.card-title {
     font-weight: 700;
-    color: #2c3e50;
+    text-transform: uppercase;
+    padding: 12px 20px;
+    letter-spacing: 0.5px;
+    transition: opacity 0.3s;
+}
+
+.btn-gradient:hover {
+    opacity: 0.9;
+}
+
+.btn-green {
+    background-color: #22c55e;
+    color: white !important;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    padding: 10px 20px;
+}
+
+.btn-green:hover {
+    background-color: #16a34a;
+}
+
+/* --- NAVIGÁCIÓS SÁV --- */
+.top-nav-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    padding: 15px 25px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 /* --- ŰRLAP MEZŐK --- */
 .form-control {
-    border-radius: 10px !important;
-    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
     padding: 12px 15px;
-    font-size: 16px;
-    transition: all 0.3s ease;
+    background-color: #f8fafc;
 }
 
-/* Amikor belekattint a felhasználó */
 .form-control:focus {
-    border-color: #ff6b6b; /* Finom pirosas-narancsos étel szín */
-    box-shadow: 0 0 0 0.25rem rgba(255, 107, 107, 0.25) !important;
-    background-color: #fffaf9;
+    border-color: #7b2cbf;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(123, 44, 191, 0.15);
 }
 
-/* --- GOMBOK --- */
-.btn-primary {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%) !important;
-    border: none !important;
-    border-radius: 10px !important;
-    padding: 12px 20px;
+/* --- CÍMKÉK (BADGES) --- */
+.badge-foetel {
+    background-color: #fbbf24;
+    color: #000;
     font-weight: bold;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    transition: all 0.3s ease;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
 }
 
-/* Gomb hover effekt */
-.btn-primary:hover {
-    transform: scale(1.03);
-    box-shadow: 0 8px 15px rgba(238, 82, 83, 0.4);
-}
-
-/* --- BEJELENTKEZŐ / REGISZTRÁCIÓS KÁRTYA --- */
-.app-card {
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(12px); /* Homályosítja a mögötte lévő dolgokat */
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 20px !important;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.4);
+.badge-desszert {
+    background-color: #ef4444;
+    color: #ffffff;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
 }

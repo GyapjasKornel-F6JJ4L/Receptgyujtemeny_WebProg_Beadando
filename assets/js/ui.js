@@ -7,12 +7,24 @@ const UI = {
     // Bejelentkező nézet kirajzolása
     renderLogin: () => {
         UI.appContainer.innerHTML = `
-            <div class="app-card mt-5" style="max-width: 420px; margin:auto;">
-                <h2 class="mb-4 text-center">Bejelentkezés</h2>
-                <div class="mb-3"><input type="text" id="login-username" class="form-control" placeholder="Felhasználónév" required></div>
-                <div class="mb-3"><input type="password" id="login-password" class="form-control" placeholder="Jelszó" required></div>
-                <div class="d-grid gap-2"><button id="login-btn" class="btn btn-primary">Belépés</button></div>
-                <p class="text-center mt-3">Nincs még fiókod? <a href="#register">Regisztrálj itt!</a></p>
+            <div class="container d-flex justify-content-center align-items-center mt-4">
+                <div class="app-card w-100" style="max-width: 420px; padding: 40px;">
+                    <h2 class="mb-2 text-center fw-bold" style="color: #2c3e50;">🍽️ ReceptMester</h2>
+                    <p class="text-center text-muted fw-bold mb-4">Jelentkezz be a folytatáshoz</p>
+                    
+                    <div class="mb-3">
+                        <input type="text" id="login-username" class="form-control" placeholder="Felhasználónév" required>
+                    </div>
+                    <div class="mb-4">
+                        <input type="password" id="login-password" class="form-control" placeholder="Jelszó" required>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mb-4">
+                        <button id="login-btn" class="btn-gradient">Belépés</button>
+                    </div>
+                    
+                    <p class="text-center mt-3 mb-0" style="color: #64748b;">Nincs még fiókod? <a href="#register" class="fw-bold" style="color: #16a34a; text-decoration: none;">Regisztrálj itt!</a></p>
+                </div>
             </div>
         `;
 
@@ -26,14 +38,21 @@ const UI = {
     // Regisztrációs nézet és form eseménykezelés
     renderRegister: () => {
         UI.appContainer.innerHTML = `
-            <div class="app-card mt-5" style="max-width: 420px; margin:auto;">
-                <h2 class="mb-4 text-center">Regisztráció</h2>
-                <div class="mb-3"><input type="text" id="reg-username" class="form-control" placeholder="Felhasználónév" required></div>
-                <div class="mb-3"><input type="email" id="reg-email" class="form-control" placeholder="E-mail cím (opcionális)"></div>
-                <div class="mb-3"><input type="password" id="reg-password" class="form-control" placeholder="Jelszó" required></div>
-                <div class="mb-3"><input type="password" id="reg-password-confirm" class="form-control" placeholder="Jelszó újra" required></div>
-                <div class="d-grid gap-2"><button id="reg-btn" class="btn btn-primary">Regisztráció</button></div>
-                <p class="text-center mt-3">Már van fiókod? <a href="#login">Lépj be itt!</a></p>
+            <div class="container d-flex justify-content-center align-items-center mt-4">
+                <div class="app-card w-100" style="max-width: 420px; padding: 40px;">
+                    <h2 class="mb-2 text-center fw-bold" style="color: #2c3e50;">🍽️ ReceptMester</h2>
+                    <p class="text-center text-muted fw-bold mb-4">Regisztráció</p>
+                    
+                    <div class="mb-3"><input type="text" id="reg-username" class="form-control" placeholder="Felhasználónév" required></div>
+                    <div class="mb-3"><input type="email" id="reg-email" class="form-control" placeholder="E-mail cím (opcionális)"></div>
+                    <div class="mb-3"><input type="password" id="reg-password" class="form-control" placeholder="Jelszó" required></div>
+                    <div class="mb-4"><input type="password" id="reg-password-confirm" class="form-control" placeholder="Jelszó újra" required></div>
+                    
+                    <div class="d-grid gap-2 mb-4">
+                        <button id="reg-btn" class="btn-gradient">Regisztráció</button>
+                    </div>
+                    <p class="text-center mt-3 mb-0" style="color: #64748b;">Már van fiókod? <a href="#login" class="fw-bold" style="color: #16a34a; text-decoration: none;">Lépj be itt!</a></p>
+                </div>
             </div>
         `;
 
@@ -52,34 +71,16 @@ const UI = {
         });
     },
 
-    // Főoldal megjelenítése:
-    // - frissül a header (felhasználó, logout, add recipe gomb)
-    // - elindul a receptek lekérése az API-ból
-    // - kártyák renderelése a táblázat helyére
+    // Főoldal megjelenítése
     renderHome: async () => {
-        const isLoggedIn = Auth.isLoggedIn();
-        const user = isLoggedIn ? Auth.getUser() : null;
-
         UI.appContainer.innerHTML = `
-            <div class="app-card mt-5">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1 class="h4">Receptgyűjtemény</h1>
-                    <div id="home-header"></div>
-                </div>
-                <div class="row" id="recipe-list"></div>
+            <div class="container mt-4">
+                <h3 class="mb-4 fw-bold" style="color: #1e293b;">Legfrissebb receptek</h3>
+                <div class="row g-4" id="recipe-list"></div>
                 <div class="text-center mt-4" id="loading"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Betöltés...</span></div></div>
-                <div class="text-center mt-4 d-none" id="no-recipes"><p class="text-muted">Még nincsenek receptek. Legyen Ön az első, aki hozzáad egyet!</p><a href="#add-recipe" class="btn btn-success">Új recept hozzáadása</a></div>
+                <div class="text-center mt-4 d-none" id="no-recipes"><p class="text-muted">Még nincsenek receptek. Legyen Ön az első, aki hozzáad egyet!</p><a href="#add-recipe" class="btn btn-green">Új recept hozzáadása</a></div>
             </div>
         `;
-
-        const header = document.getElementById('home-header');
-        if (header) {
-            header.innerHTML = isLoggedIn
-                ? `Szia, <strong>${user.username}</strong>! <a href="#add-recipe" class="btn btn-sm btn-outline-primary ms-2">+ Új recept</a> <button id="logout-btn" class="btn btn-sm btn-outline-danger ms-2">Kijelentkezés</button>`
-                : '<span>Fedezd fel a recepteket!</span>';
-        }
-
-        document.getElementById('logout-btn')?.addEventListener('click', Auth.logout);
 
         const data = await Api.call(API_ACTIONS.GET_RECIPES);
         const listContainer = document.getElementById('recipe-list');
@@ -99,7 +100,7 @@ const UI = {
         data.forEach((recipe) => listContainer.insertAdjacentHTML('beforeend', UI.buildRecipeCard(recipe)));
     },
 
-    // Csak a bejelentkezett felhasználó saját receptjei (Profil → Receptjeim)
+    // Csak a bejelentkezett felhasználó saját receptjei
     renderMyRecipes: async () => {
         const user = Auth.getUser();
         if (!user) {
@@ -108,19 +109,18 @@ const UI = {
         }
 
         UI.appContainer.innerHTML = `
-            <div class="app-card mt-5">
-                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                    <h1 class="h4 mb-0">Receptjeim</h1>
-                    <div>
-                        <a href="#home" class="btn btn-sm btn-outline-secondary">Összes recept</a>
-                        <a href="#add-recipe" class="btn btn-sm btn-primary ms-1">+ Új recept</a>
-                    </div>
+            <div class="container mt-4 mb-3">
+                <div class="top-nav-card py-3 px-4 mx-auto" style="max-width: 900px; margin-top: 0;">
+                    <a class="fw-bold text-decoration-none" href="#home" style="color: #334155; font-size: 1.1rem;">⬅ Vissza a főoldalra</a>
                 </div>
-                <div class="row" id="my-recipe-list"></div>
+            </div>
+            <div class="container mt-4">
+                <h3 class="mb-4 fw-bold" style="color: #1e293b;">Saját receptjeim</h3>
+                <div class="row g-4" id="my-recipe-list"></div>
                 <div class="text-center mt-4" id="my-loading"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Betöltés...</span></div></div>
                 <div class="text-center mt-4 d-none" id="my-no-recipes">
                     <p class="text-muted">Még nincs saját recepted.</p>
-                    <a href="#add-recipe" class="btn btn-success">Új recept hozzáadása</a>
+                    <a href="#add-recipe" class="btn btn-green">Új recept hozzáadása</a>
                 </div>
             </div>
         `;
@@ -146,68 +146,90 @@ const UI = {
     // Recepteket megjelenítő kártya HTML sablonja
     buildRecipeCard: (recipe = {}) => {
         const id = recipe.id ?? '0';
-        const img = recipe.image || 'https://via.placeholder.com/400x250?text=Recept';
+
+        // --- OKOS KÉPVÁLASZTÓ KATEGÓRIA ALAPJÁN ---
+        let placeholderImg = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'; // Alap (Főétel)
+        if (recipe.type === "Desszert" || recipe.type === "Desszertek") {
+            placeholderImg = 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'; // Desszert kép
+        } else if (recipe.type === "Előétel" || recipe.type === "Levesek") {
+            placeholderImg = 'https://images.unsplash.com/photo-1547592180-85f173990554?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'; // Előétel/Leves kép
+        }
+
+        const img = recipe.image || placeholderImg;
         const title = recipe.title || 'Ismeretlen recept';
         const desc = recipe.description || 'Leírás nem elérhető.';
-        const type = recipe.type ? `<span class="badge bg-success">${recipe.type}</span>` : '';
+        
+        let badgeHtml = `<span class="badge bg-secondary mb-3 d-inline-block px-3 py-1">${recipe.type || 'Recept'}</span>`;
+        if(recipe.type === "Főétel" || recipe.type === "Főételek") badgeHtml = `<span class="badge-foetel mb-3 d-inline-block">Főétel</span>`;
+        if(recipe.type === "Desszert" || recipe.type === "Desszertek") badgeHtml = `<span class="badge-desszert mb-3 d-inline-block">Desszert</span>`;
+        if(recipe.type === "Levesek" || recipe.type === "Előétel") badgeHtml = `<span class="badge bg-success mb-3 d-inline-block px-3 py-1">${recipe.type}</span>`;
 
         return `
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm border-0">
-                    <img src="${img}" class="card-img-top" alt="${title}">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">${title}</h5>
-                        <p class="card-text text-truncate" style="max-height: 4.8em;">${desc}</p>
-                        <div class="mt-auto d-flex justify-content-between align-items-center">
-                            ${type}
-                            <a href="#recipe/${id}" class="btn btn-primary btn-sm">Megtekintés</a>
-                        </div>
+            <div class="col-md-4">
+                <div class="recipe-card">
+                    <img src="${img}" alt="${title}">
+                    <div class="card-body p-4 d-flex flex-column">
+                        ${badgeHtml}
+                        <h4 class="card-title fw-bold" style="color: #1e293b;">${title}</h4>
+                        <p class="card-text mt-2 text-truncate" style="color: #64748b; max-height: 4.8em;">${desc}</p>
+                        <a href="#recipe/${id}" class="btn-gradient mt-auto w-100 text-center text-decoration-none">Megnézem</a>
                     </div>
                 </div>
             </div>
         `;
     },
 
-    // Új recept oldal ideiglenes sablonja (fejlesztés alatt)
+    // Új recept oldal
     renderAddRecipe: () => {
         const user = Auth.getUser();
         if (!user) {
             UI.appContainer.innerHTML = `
-                <div class="app-card mt-5" style="max-width: 700px; margin:auto;">
-                    <p>Be kell jelentkezned ahhoz, hogy recept hozzáadass.</p>
-                    <a href="#login" class="btn btn-primary">Bejelentkezés</a>
+                <div class="container d-flex justify-content-center align-items-center mt-4">
+                    <div class="app-card text-center" style="max-width: 500px;">
+                        <p class="fs-5 text-muted mb-4">Be kell jelentkezned ahhoz, hogy receptet adhass hozzá.</p>
+                        <a href="#login" class="btn-gradient w-100 text-decoration-none d-block">Bejelentkezés</a>
+                    </div>
                 </div>
             `;
             return;
         }
 
         UI.appContainer.innerHTML = `
-            <div class="app-card mt-5" style="max-width: 700px; margin:auto;">
-                <a href="#home" class="text-decoration-none mb-3 d-inline-block">⬅ Vissza</a>
-                <h2>Új recept hozzáadása</h2>
-                <form id="add-recipe-form">
-                    <div class="mb-3">
-                        <label for="recipe-title" class="form-label">Recept neve</label>
-                        <input type="text" class="form-control" id="recipe-title" placeholder="Recept neve" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="recipe-description" class="form-label">Leírás</label>
-                        <textarea class="form-control" id="recipe-description" rows="3" placeholder="Recept leírása"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="recipe-category" class="form-label">Kategória</label>
-                        <select class="form-control" id="recipe-category">
-                            <option value="1">Levesek</option>
-                            <option value="2">Főételek</option>
-                            <option value="3">Desszertek</option>
-                            <option value="4">Saláták</option>
-                            <option value="5">Reggelik</option>
-                        </select>
-                    </div>
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">Hozzáadás</button>
-                    </div>
-                </form>
+            <div class="container mt-4 mb-3">
+                <div class="top-nav-card py-3 px-4 mx-auto" style="max-width: 700px; margin-top: 0;">
+                    <a class="fw-bold text-decoration-none" href="#home" style="color: #334155; font-size: 1.1rem;">⬅ Vissza a főoldalra</a>
+                </div>
+            </div>
+
+            <div class="container mb-5">
+                <div class="app-card mx-auto" style="max-width: 700px; padding: 40px;">
+                    <h2 class="mb-4 fw-bold text-center" style="color: #1e293b;">✍️ Új Recept Felvitele</h2>
+                    
+                    <form id="add-recipe-form">
+                        <div class="mb-4">
+                            <label for="recipe-title" class="form-label fw-bold" style="color: #1e293b; font-size: 0.95rem;">Recept neve</label>
+                            <input type="text" class="form-control" id="recipe-title" placeholder="Pl.: Nagyi húslevese" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="recipe-category" class="form-label fw-bold" style="color: #1e293b; font-size: 0.95rem;">Kategória</label>
+                            <select class="form-control" id="recipe-category" style="appearance: auto;">
+                                <option value="1">Előétel</option>
+                                <option value="2">Főétel</option>
+                                <option value="3">Desszert</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-5">
+                            <label for="recipe-description" class="form-label fw-bold" style="color: #1e293b; font-size: 0.95rem;">Elkészítés leírása</label>
+                            <textarea class="form-control" id="recipe-description" rows="6" placeholder="Kezdd azzal, hogy megpucolod a hagymát..."></textarea>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-2">
+                            <button type="submit" class="btn-gradient py-3">MENTÉS AZ ADATBÁZISBA</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         `;
 
@@ -246,10 +268,13 @@ const UI = {
     // Recept részleteinek lekérése és megjelenítése
     renderRecipeDetails: async (id) => {
         UI.appContainer.innerHTML = `
-            <div class="app-card mt-5" style="max-width: 900px; margin:auto;">
-                <a href="#home" class="text-decoration-none mb-3 d-inline-block">⬅ Vissza</a>
-                <h2>Recept részletei</h2>
-                <div id="recipe-content" class="mt-3">Betöltés...</div>
+            <div class="container mt-4 mb-3">
+                <div class="top-nav-card py-3 px-4 mx-auto" style="max-width: 800px; margin-top: 0;">
+                    <a class="fw-bold text-decoration-none" href="#home" style="color: #334155; font-size: 1.1rem;">⬅ Vissza a listához</a>
+                </div>
+            </div>
+            <div class="container mb-5" id="recipe-content">
+                <div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>
             </div>
         `;
 
@@ -262,18 +287,42 @@ const UI = {
         }
 
         if (!data || !data.title) {
-            container.innerHTML = '<div class="alert alert-warning">Recept nem található.</div>';
+            container.innerHTML = '<div class="alert alert-warning text-center mx-auto" style="max-width: 800px;">Recept nem található.</div>';
             return;
         }
 
+        const categoryName = data.category || 'Recept';
+
+        // --- OKOS KÉPVÁLASZTÓ A RÉSZLETEK OLDALRA IS ---
+        let placeholderImg = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'; // Alap (Főétel)
+        if (categoryName === "Desszert" || categoryName === "Desszertek") {
+            placeholderImg = 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'; // Desszert
+        } else if (categoryName === "Előétel" || categoryName === "Levesek") {
+            placeholderImg = 'https://images.unsplash.com/photo-1547592180-85f173990554?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'; // Előétel
+        }
+
+        const imgUrl = data.image || placeholderImg;
+        
+        let badgeHtml = `<span class="badge bg-secondary mb-3 px-3 py-2">${categoryName}</span>`;
+        if(categoryName === "Főétel" || categoryName === "Főételek") badgeHtml = `<span class="badge-foetel mb-3 d-inline-block px-3 py-2">Főétel</span>`;
+        if(categoryName === "Desszert" || categoryName === "Desszertek") badgeHtml = `<span class="badge-desszert mb-3 d-inline-block px-3 py-2">Desszert</span>`;
+        if(categoryName === "Levesek" || categoryName === "Előétel") badgeHtml = `<span class="badge bg-success mb-3 d-inline-block px-3 py-2">${categoryName}</span>`;
+
         container.innerHTML = `
-            <img src="${data.image || 'https://via.placeholder.com/800x400?text=Nincs+kép'}" class="img-fluid rounded mb-3" alt="${data.title}">
-            <p><strong>Kategória:</strong> ${data.type || data.category || 'N/A'}</p>
-            <p>${data.description || 'Nincs leírás.'}</p>
-            <h5>Hozzávalók</h5>
-            <pre>${data.ingredients || '-'}</pre>
-            <h5>Elkészítés</h5>
-            <pre>${data.instructions || '-'}</pre>
+            <div class="app-card mx-auto p-0 overflow-hidden text-start" style="max-width: 800px;">
+                <img src="${imgUrl}" alt="${data.title}" class="w-100" style="height: 400px; object-fit: cover;">
+                
+                <div class="p-5">
+                    ${badgeHtml}
+                    <h1 class="fw-bold mb-3" style="color: #1e293b; font-size: 2.5rem;">${data.title}</h1>
+                    <p class="text-muted mb-5" style="font-size: 0.95rem;"><strong>Feltöltötte:</strong> ${data.author || 'Ismeretlen'}</p>
+                    
+                    <hr style="border-color: #e2e8f0; margin-bottom: 2rem;">
+                    
+                    <h4 class="fw-bold mt-4 mb-4" style="color: #b91c1c;">Elkészítés lépései</h4>
+                    <p style="line-height: 1.8; font-size: 1.05rem; color: #475569; white-space: pre-wrap;">${data.description || 'Nincs leírás megadva.'}</p>
+                </div>
+            </div>
         `;
-    },
+    }
 };
