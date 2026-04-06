@@ -21,7 +21,7 @@ const Auth = {
     getUser: () => {
         return JSON.parse(localStorage.getItem('user')) || null;
     },
-
+    // Bejelentkezési állapot ellenőrzése: ha van user adat a localStorage-ben, akkor be van jelentkezve.   
     isLoggedIn: () => {
         return Auth.getUser() !== null;
     },
@@ -57,7 +57,7 @@ const Auth = {
             alert('Szerverhiba történt, próbáld újra később.');
         }
     },
-
+    // Regisztráció funkció
     register: async (username, password, email = null) => {
         if (!username || !password) {
             alert('Add meg a felhasználónevet és jelszót a regisztrációhoz.');

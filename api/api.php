@@ -4,7 +4,12 @@ header('Content-Type: application/json; charset=utf-8');
 require_once '../includes/queries.php';
 
 $queryManager = new queries();
-$request = json_decode(file_get_contents('php://input'), true);
+$input = file_get_contents('php://input');
+$request = json_decode($input, true);
+
+if (!$request) {
+    $request = [];
+}
 
 try {
     $action = $request['action'] ?? '';
@@ -72,13 +77,117 @@ try {
         $title = $request['title'] ?? '';
         $description = $request['description'] ?? '';
         $categoryId = $request['category_id'] ?? 1;
+        $image = $request['image'] ?? null;
 
         if (empty($title) || empty($userId)) {
              throw new Exception("A recept neve kötelező, és be kell jelentkezned hozzá!");
         }
 
-        $result = $queryManager->addRecipe($userId, $title, $description, $categoryId);
+        $result = $queryManager->addRecipe($userId, $title, $description, $categoryId, $image);
         echo json_encode($result);
+    }
+
+    // 6. Recept hozzávalóinak hozzáadása
+    elseif ($action === 'add_recipe_ingredient') {
+        $recipeId = $request['recipe_id'] ?? null;
+        $ingredientId = $request['ingredient_id'] ?? null;
+        $quantity = $request['quantity'] ?? null;
+        $unit = $request['unit'] ?? 'g';
+
+        if (empty($recipeId) || empty($ingredientId)) {
+            throw new Exception("Recept ID és hozzávaló ID kötelező!");
+        }
+
+        $result = $queryManager->addRecipeIngredient($recipeId, $ingredientId, $quantity, $unit);
+        echo json_encode($result);
+    }
+
+    // 7. Recept lépésének hozzáadása
+    elseif ($action === 'add_recipe_step') {
+        $recipeId = $request['recipe_id'] ?? null;
+        $stepNumber = $request['step_number'] ?? 1;
+        $description = $request['description'] ?? '';
+
+        if (empty($recipeId) || empty($description)) {
+            throw new Exception("Recept ID és lépés leírása kötelező!");
+        }
+
+        $result = $queryManager->addRecipeStep($recipeId, $stepNumber, $description);
+        echo json_encode($result);
+    }
+
+    // 8. Recept hozzávalóinak lekérése
+    elseif ($action === 'get_recipe_ingredients') {
+        $recipeId = $request['recipe_id'] ?? null;
+        if (empty($recipeId)) {
+            throw new Exception("Recept ID kötelező!");
+        }
+        $data = $queryManager->get_recipe_ingredients($recipeId);
+        echo json_encode($data);
+    }
+
+    // 9. Recept lépéseinek lekérése
+    elseif ($action === 'get_recipe_steps') {
+        $recipeId = $request['recipe_id'] ?? null;
+        if (empty($recipeId)) {
+            throw new Exception("Recept ID kötelező!");
+        }
+        $data = $queryManager->get_recipe_steps($recipeId);
+        echo json_encode($data);
+    }
+
+    // 10. Összes hozzávaló lekérése (kiválasztáshoz)
+    elseif ($action === 'get_all_ingredients') {
+        $data = $queryManager->get_all_ingredients();
+        echo json_encode($data);
+    }
+
+    // 11. Új hozzávaló hozzáadása
+    elseif ($action === 'add_ingredient') {
+        $name = $request['name'] ?? '';
+        if (empty($name)) {
+            throw new Exception("A hozzavaló neve kötelező!");
+        }
+        $result = $queryManager->addIngredient($name);
+        echo json_encode($result);
+    }
+
+    // 12. Kép feltöltése
+    elseif ($action === 'upload_image') {
+        if (!isset($_FILES['image'])) {
+            throw new Exception("Kép fájl szükséges!");
+        }
+        
+        $file = $_FILES['image'];
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        
+        if (!in_array($file['type'], $allowedTypes)) {
+            throw new Exception("Csak JPG, PNG, GIF vagy WEBP formátum engedélyezett!");
+        }
+        
+        if ($file['size'] > 5000000) {
+            throw new Exception("A kép maximális mérete 5MB!");
+        }
+        
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $newFilename = uniqid('recipe_') . '.' . $extension;
+        $uploadDir = '../uploads/';
+        
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+        
+        $targetPath = $uploadDir . $newFilename;
+        
+        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+            echo json_encode([
+                "success" => true,
+                "filename" => $newFilename,
+                "path" => 'uploads/' . $newFilename
+            ]);
+        } else {
+            throw new Exception("Hiba a fájl feltöltése során!");
+        }
     }
     
     // Ha ismeretlen a kérés

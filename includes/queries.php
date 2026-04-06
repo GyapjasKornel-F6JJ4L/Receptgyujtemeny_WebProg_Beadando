@@ -53,9 +53,12 @@ class queries extends Database
             }
         }
         
+        // Jelszó hash-elése bcrypt-kel
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+        
         // Új felhasználó beszúrása
         $sql = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-        $sql->execute([$username, $email, $password]);
+        $sql->execute([$username, $email, $hashedPassword]);
         
         return ["success" => true, "message" => "Sikeres regisztráció!"];
     }
@@ -68,8 +71,8 @@ class queries extends Database
         $sql->execute([$username]);
         $user = $sql->fetch();
 
-        // Jelszó ellenőrzése
-        if ($user && $user['password'] === $password) {
+        // Jelszó ellenőrzése password_verify()-vel
+        if ($user && password_verify($password, $user['password'])) {
             return [
                 "success" => true, 
                 "user" => [
@@ -83,14 +86,14 @@ class queries extends Database
     }
 
     // 4. Új recept hozzáadása
-    public function addRecipe($userId, $title, $description, $categoryId) {
+    public function addRecipe($userId, $title, $description, $categoryId, $image = null) {
         $pdo = $this->connect();
         
-        // Alapértelmezett kategória, ha nem lenne megadva
         $categoryId = $categoryId ?: 1; 
+        $createdAt = date('Y-m-d');
 
-        $sql = $pdo->prepare("INSERT INTO recipes (user_id, category_id, title, description) VALUES (?, ?, ?, ?)");
-        $sql->execute([$userId, $categoryId, $title, $description]);
+        $sql = $pdo->prepare("INSERT INTO recipes (user_id, category_id, title, description, image, created_at) VALUES (?, ?, ?, ?, ?, ?)");
+        $sql->execute([$userId, $categoryId, $title, $description, $image, $createdAt]);
         
         return [
             "success" => true, 
@@ -109,6 +112,73 @@ class queries extends Database
                               WHERE r.id = ?");
         $sql->execute([$id]);
         return $sql->fetch();
+    }
+
+    // 6. Hozzávalók hozzáadása recipe_ingredients táblához
+    public function addRecipeIngredient($recipeId, $ingredientId, $quantity, $unit) {
+        $pdo = $this->connect();
+        
+        $sql = $pdo->prepare("INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit) VALUES (?, ?, ?, ?)");
+        $sql->execute([$recipeId, $ingredientId, $quantity, $unit]);
+        
+        return ["success" => true, "ingredient_id" => $pdo->lastInsertId()];
+    }
+
+    // 7. Lépések hozzáadása steps táblához
+    public function addRecipeStep($recipeId, $stepNumber, $description) {
+        $pdo = $this->connect();
+        
+        $sql = $pdo->prepare("INSERT INTO steps (recipe_id, step_number, description) VALUES (?, ?, ?)");
+        $sql->execute([$recipeId, $stepNumber, $description]);
+        
+        return ["success" => true, "step_id" => $pdo->lastInsertId()];
+    }
+
+    // 8. Recept hozzávalóinak lekérése
+    public function get_recipe_ingredients($recipeId) {
+        $pdo = $this->connect();
+        
+        $sql = $pdo->prepare("SELECT ri.id, ri.quantity, ri.unit, i.name as ingredient_name, i.id as ingredient_id 
+                              FROM recipe_ingredients ri
+                              LEFT JOIN ingredients i ON ri.ingredient_id = i.id
+                              WHERE ri.recipe_id = ?");
+        $sql->execute([$recipeId]);
+        return $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // 9. Recept lépéseinek lekérése
+    public function get_recipe_steps($recipeId) {
+        $pdo = $this->connect();
+        
+        $sql = $pdo->prepare("SELECT id, step_number, description FROM steps WHERE recipe_id = ? ORDER BY step_number");
+        $sql->execute([$recipeId]);
+        return $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // 10. Összes hozzávaló lekérése (kiválasztáshoz)
+    public function get_all_ingredients() {
+        $pdo = $this->connect();
+        
+        $sql = $pdo->prepare("SELECT id, name FROM ingredients ORDER BY name");
+        $sql->execute();
+        return $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // 11. Új hozzávaló hozzáadása
+    public function addIngredient($name) {
+        $pdo = $this->connect();
+        
+        $check = $pdo->prepare("SELECT id FROM ingredients WHERE name = ?");
+        $check->execute([$name]);
+        if ($check->rowCount() > 0) {
+            $existing = $check->fetch();
+            return ["success" => true, "ingredient_id" => $existing['id'], "message" => "A hozzávaló már létezik."];
+        }
+        
+        $sql = $pdo->prepare("INSERT INTO ingredients (name) VALUES (?)");
+        $sql->execute([$name]);
+        
+        return ["success" => true, "ingredient_id" => $pdo->lastInsertId()];
     }
 }
 ?>

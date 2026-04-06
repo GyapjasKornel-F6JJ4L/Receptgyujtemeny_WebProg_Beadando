@@ -29,7 +29,7 @@ const Router = {
     },
 
     // Fő útvonalkezelő: ellenőrzi bejelentkezési állapotot és kiadja a nézetnek a renderelést.
-    handleRoute: () => {
+    handleRoute: async () => {
         const hash = window.location.hash;
         const route = Router.parseHash(hash);
         const isLoggedIn = Auth.isLoggedIn();
@@ -52,14 +52,14 @@ const Router = {
         // #recipe/:id esetében dinamikus ID-vel hívjuk a detail nézetet.
         if (route === 'recipe') {
             const recipeId = hash.split('/')[1];
-            UI.renderRecipeDetails(recipeId);
+            await UI.renderRecipeDetails(recipeId);
             return;
         }
 
         // Ha route megtalálható a routes mapben, renderelni kell.
         const view = Router.routes[route];
         if (view) {
-            view();
+            await view();
             return;
         }
 

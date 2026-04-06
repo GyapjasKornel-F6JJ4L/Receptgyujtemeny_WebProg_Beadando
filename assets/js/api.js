@@ -10,6 +10,12 @@ const API_ACTIONS = {
     GET_MY_RECIPES: 'get_my_recipes',
     GET_RECIPE_DETAILS: 'get_recipe_details',
     ADD_RECIPE: 'add_recipe',
+    ADD_RECIPE_INGREDIENT: 'add_recipe_ingredient',
+    ADD_RECIPE_STEP: 'add_recipe_step',
+    GET_RECIPE_INGREDIENTS: 'get_recipe_ingredients',
+    GET_RECIPE_STEPS: 'get_recipe_steps',
+    GET_ALL_INGREDIENTS: 'get_all_ingredients',
+    ADD_INGREDIENT: 'add_ingredient',
     LOGIN: 'login',
     REGISTER: 'register'
 };
