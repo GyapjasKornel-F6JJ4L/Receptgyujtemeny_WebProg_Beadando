@@ -152,7 +152,22 @@ try {
         echo json_encode($result);
     }
 
-    // 12. Kép feltöltése
+    // 12. Kategóriák lekérése
+    elseif ($action === 'get_categories') {
+        $data = $queryManager->get_categories();
+        echo json_encode($data);
+    }
+
+    // 13. Receptek keresése/szűrése
+    elseif ($action === 'search_recipes') {
+        $categoryId = $request['category_id'] ?? null;
+        $searchTerm = $request['search'] ?? null;
+        $userId = $request['user_id'] ?? null;
+        $data = $queryManager->search_recipes($categoryId, $searchTerm, $userId);
+        echo json_encode($data);
+    }
+
+    // 14. Kép feltöltése
     elseif ($action === 'upload_image') {
         if (!isset($_FILES['image'])) {
             throw new Exception("Kép fájl szükséges!");

@@ -34,10 +34,6 @@ const Router = {
         const route = Router.parseHash(hash);
         const isLoggedIn = Auth.isLoggedIn();
 
-        if (route === 'home') {
-            window.location.hash = '#home';
-        }
-
         // Vendég: receptlista, részletek, login/register; egyéb (pl. saját receptek) → bejelentkezés
         if (!isLoggedIn && !['home', 'login', 'register', 'recipe'].includes(route)) {
             window.location.hash = '#login';
@@ -63,7 +59,12 @@ const Router = {
             return;
         }
 
-        UI.appContainer.innerHTML = `\n            <div class="container text-center py-5">\n                <h2>404 - Az oldal nem található</h2>\n                <a href="#home" class="btn btn-primary mt-3">Vissza a főoldalra</a>\n            </div>\n        `;
+        UI.appContainer.innerHTML = `
+            <div class="container text-center py-5">
+                <h2>404 - Az oldal nem található</h2>
+                <a href="#home" class="btn btn-primary mt-3">Vissza a főoldalra</a>
+            </div>
+        `;
     },
 };
 

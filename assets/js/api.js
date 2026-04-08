@@ -16,6 +16,8 @@ const API_ACTIONS = {
     GET_RECIPE_STEPS: 'get_recipe_steps',
     GET_ALL_INGREDIENTS: 'get_all_ingredients',
     ADD_INGREDIENT: 'add_ingredient',
+    GET_CATEGORIES: 'get_categories',
+    SEARCH_RECIPES: 'search_recipes',
     LOGIN: 'login',
     REGISTER: 'register'
 };

@@ -180,5 +180,48 @@ class queries extends Database
         
         return ["success" => true, "ingredient_id" => $pdo->lastInsertId()];
     }
+
+    // 12. Kategóriák lekérése
+    public function get_categories() {
+        $pdo = $this->connect();
+        
+        $sql = $pdo->prepare("SELECT id, name FROM categories ORDER BY id");
+        $sql->execute();
+        return $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // 13. Receptek szűrése kategória és/vagy keresés alapján
+    public function search_recipes($categoryId = null, $searchTerm = null, $userId = null) {
+        $pdo = $this->connect();
+        
+        $sql = "SELECT r.id, r.title, r.description, r.image, c.name AS type
+                FROM recipes r
+                LEFT JOIN categories c ON r.category_id = c.id
+                WHERE 1=1";
+        $params = [];
+
+        if ($userId) {
+            $sql .= " AND r.user_id = ?";
+            $params[] = (int) $userId;
+        }
+        
+        if ($categoryId && $categoryId !== 'all') {
+            $sql .= " AND r.category_id = ?";
+            $params[] = (int) $categoryId;
+        }
+        
+        if ($searchTerm && trim($searchTerm) !== '') {
+            $sql .= " AND (r.title LIKE ? OR r.description LIKE ?)";
+            $search = '%' . trim($searchTerm) . '%';
+            $params[] = $search;
+            $params[] = $search;
+        }
+        
+        $sql .= " ORDER BY r.id";
+        
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 ?>

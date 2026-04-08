@@ -83,31 +83,109 @@ const UI = {
 
     // Főoldal megjelenítése
     renderHome: async () => {
+        let catOptions = `
+            <option value="all">Összes kategória</option>
+            <option value="1">Levesek</option>
+            <option value="2">Főételek</option>
+            <option value="3">Desszertek</option>
+            <option value="4">Saláták</option>
+            <option value="5">Reggelik</option>
+        `;
+
         UI.appContainer.innerHTML = `
             <div class="container mt-4">
+                <div class="app-card mb-4 p-4">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="color: #1e293b;">Keresés</label>
+                            <input type="text" id="search-input" class="form-control" placeholder="Recept neve...">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold" style="color: #1e293b;">Kategoria</label>
+                            <select id="category-select" class="form-control" style="appearance: auto;">
+                                ${catOptions}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button id="filter-btn" class="btn-gradient w-100">Keresés</button>
+                        </div>
+                    </div>
+                </div>
+                
                 <h3 class="mb-4 fw-bold" style="color: #1e293b;">Legfrissebb receptek</h3>
                 <div class="row g-4" id="recipe-list"></div>
                 <div class="text-center mt-4" id="loading"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Betöltés...</span></div></div>
-                <div class="text-center mt-4 d-none" id="no-recipes"><p class="text-muted">Még nincsenek receptek. Legyen Ön az első, aki hozzáad egyet!</p><a href="#add-recipe" class="btn btn-green">Új recept hozzáadása</a></div>
+                <div class="text-center mt-4 d-none" id="no-recipes"><p class="text-muted">Nincs talalat a megadott kritériumokra.</p><a href="#home" class="btn btn-green" id="reset-filters">Szures torlese</a></div>
             </div>
         `;
 
-        const data = await Api.call(API_ACTIONS.GET_RECIPES);
-        const listContainer = document.getElementById('recipe-list');
-        document.getElementById('loading')?.classList.add('d-none');
+        let currentSearch = '';
+        let currentCategory = 'all';
 
-        if (data.error) {
-            listContainer.innerHTML = `<div class="alert alert-danger">Hiba: ${data.error}</div>`;
-            return;
+        async function loadRecipes() {
+            const listContainer = document.getElementById('recipe-list');
+            const loading = document.getElementById('loading');
+            const noRecipes = document.getElementById('no-recipes');
+            
+            if (loading) loading.classList.remove('d-none');
+            if (noRecipes) noRecipes.classList.add('d-none');
+            listContainer.innerHTML = '';
+
+            try {
+                let data;
+                if (currentSearch || (currentCategory && currentCategory !== 'all')) {
+                    data = await Api.call(API_ACTIONS.SEARCH_RECIPES, { 
+                        search: currentSearch, 
+                        category_id: currentCategory 
+                    });
+                } else {
+                    data = await Api.call(API_ACTIONS.GET_RECIPES);
+                }
+
+                if (loading) loading.classList.add('d-none');
+
+                if (data.error) {
+                    listContainer.innerHTML = `<div class="alert alert-danger">Hiba: ${data.error}</div>`;
+                    return;
+                }
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    if (noRecipes) noRecipes.classList.remove('d-none');
+                    return;
+                }
+
+                data.forEach((recipe) => listContainer.insertAdjacentHTML('beforeend', UI.buildRecipeCard(recipe)));
+            } catch (err) {
+                console.error('Hiba a receptek betöltésénél:', err);
+                if (loading) loading.classList.add('d-none');
+                listContainer.innerHTML = '<div class="alert alert-danger">Hiba a betöltés során.</div>';
+            }
         }
 
-        if (!Array.isArray(data) || data.length === 0) {
-            document.getElementById('no-recipes')?.classList.remove('d-none');
-            return;
-        }
+        document.getElementById('filter-btn')?.addEventListener('click', () => {
+            currentSearch = document.getElementById('search-input').value.trim();
+            currentCategory = document.getElementById('category-select').value;
+            loadRecipes();
+        });
 
-        listContainer.innerHTML = '';
-        data.forEach((recipe) => listContainer.insertAdjacentHTML('beforeend', UI.buildRecipeCard(recipe)));
+        document.getElementById('search-input')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                currentSearch = e.target.value.trim();
+                currentCategory = document.getElementById('category-select').value;
+                loadRecipes();
+            }
+        });
+
+        document.getElementById('reset-filters')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('search-input').value = '';
+            document.getElementById('category-select').value = 'all';
+            currentSearch = '';
+            currentCategory = 'all';
+            loadRecipes();
+        });
+
+        loadRecipes();
     },
 
     // Csak a bejelentkezett felhasználó saját receptjei
@@ -118,39 +196,110 @@ const UI = {
             return;
         }
 
+        let catOptions = `
+            <option value="all">Összes kategória</option>
+            <option value="1">Levesek</option>
+            <option value="2">Főételek</option>
+            <option value="3">Desszertek</option>
+            <option value="4">Saláták</option>
+            <option value="5">Reggelik</option>
+        `;
+
         UI.appContainer.innerHTML = `
             <div class="container mt-4 mb-3">
                 <div class="top-nav-card py-3 px-4 mx-auto" style="max-width: 900px; margin-top: 0;">
                     <a class="fw-bold text-decoration-none" href="#home" style="color: #334155; font-size: 1.1rem;">⬅ Vissza a főoldalra</a>
                 </div>
             </div>
-            <div class="container mt-4">
+
+            <div class="container mt-2 mb-4">
+                <div class="app-card mb-4 p-4">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="color: #1e293b;">Keresés</label>
+                            <input type="text" id="my-search-input" class="form-control" placeholder="Recept neve...">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold" style="color: #1e293b;">Kategoria</label>
+                            <select id="my-category-select" class="form-control" style="appearance: auto;">
+                                ${catOptions}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button id="my-filter-btn" class="btn-gradient w-100">Keresés</button>
+                        </div>
+                    </div>
+                </div>
+
                 <h3 class="mb-4 fw-bold" style="color: #1e293b;">Saját receptjeim</h3>
                 <div class="row g-4" id="my-recipe-list"></div>
                 <div class="text-center mt-4" id="my-loading"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Betöltés...</span></div></div>
                 <div class="text-center mt-4 d-none" id="my-no-recipes">
-                    <p class="text-muted">Még nincs saját recepted.</p>
+                    <p class="text-muted">Nincs talalat a megadott kritériumokra.</p>
                     <a href="#add-recipe" class="btn btn-green">Új recept hozzáadása</a>
                 </div>
             </div>
         `;
 
-        const data = await Api.call(API_ACTIONS.GET_MY_RECIPES, { user_id: user.id });
-        const listContainer = document.getElementById('my-recipe-list');
-        document.getElementById('my-loading')?.classList.add('d-none');
+        let currentSearch = '';
+        let currentCategory = 'all';
 
-        if (data.error) {
-            listContainer.innerHTML = `<div class="alert alert-danger">Hiba: ${data.error}</div>`;
-            return;
+        async function loadMyRecipes() {
+            const listContainer = document.getElementById('my-recipe-list');
+            const loading = document.getElementById('my-loading');
+            const noRecipes = document.getElementById('my-no-recipes');
+            
+            if (loading) loading.classList.remove('d-none');
+            if (noRecipes) noRecipes.classList.add('d-none');
+            listContainer.innerHTML = '';
+
+            try {
+                let data;
+                if (currentSearch || (currentCategory && currentCategory !== 'all')) {
+                    data = await Api.call(API_ACTIONS.SEARCH_RECIPES, { 
+                        search: currentSearch, 
+                        category_id: currentCategory,
+                        user_id: user.id
+                    });
+                } else {
+                    data = await Api.call(API_ACTIONS.GET_MY_RECIPES, { user_id: user.id });
+                }
+
+                if (loading) loading.classList.add('d-none');
+
+                if (data.error) {
+                    listContainer.innerHTML = `<div class="alert alert-danger">Hiba: ${data.error}</div>`;
+                    return;
+                }
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    if (noRecipes) noRecipes.classList.remove('d-none');
+                    return;
+                }
+
+                data.forEach((recipe) => listContainer.insertAdjacentHTML('beforeend', UI.buildRecipeCard(recipe)));
+            } catch (err) {
+                console.error('Hiba a receptek betöltésénél:', err);
+                if (loading) loading.classList.add('d-none');
+                listContainer.innerHTML = '<div class="alert alert-danger">Hiba a betöltés során.</div>';
+            }
         }
 
-        if (!Array.isArray(data) || data.length === 0) {
-            document.getElementById('my-no-recipes')?.classList.remove('d-none');
-            return;
-        }
+        document.getElementById('my-filter-btn')?.addEventListener('click', () => {
+            currentSearch = document.getElementById('my-search-input').value.trim();
+            currentCategory = document.getElementById('my-category-select').value;
+            loadMyRecipes();
+        });
 
-        listContainer.innerHTML = '';
-        data.forEach((recipe) => listContainer.insertAdjacentHTML('beforeend', UI.buildRecipeCard(recipe)));
+        document.getElementById('my-search-input')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                currentSearch = e.target.value.trim();
+                currentCategory = document.getElementById('my-category-select').value;
+                loadMyRecipes();
+            }
+        });
+
+        loadMyRecipes();
     },
 
     // Recepteket megjelenítő kártya HTML sablonja
