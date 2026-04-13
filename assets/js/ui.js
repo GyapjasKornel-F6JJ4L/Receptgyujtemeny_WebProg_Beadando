@@ -481,14 +481,34 @@ const UI = {
                         const selectEl = row.querySelector('.ingredient-select');
                         let ingredientId = selectEl.value;
                         
+                        const newRow = row.querySelector('.ingredient-new-row');
                         const newNameInput = row.querySelector('.ingredient-new-name');
-                        const newName = newNameInput.value.trim();
+                        const newName = newRow.classList.contains('d-none') ? '' : newNameInput.value.trim();
                         
                         const quantity = row.querySelector('.ingredient-quantity').value;
-                        const unit = row.querySelector('.ingredient-unit').value;
+                        let unit = row.querySelector('.ingredient-unit').value;
+                        
+                        const unitNewRow = row.querySelector('.unit-new-row');
+                        const newUnitNameInput = row.querySelector('.unit-new-name');
+                        const newUnitAbbrInput = row.querySelector('.unit-new-abbr');
+                        const newUnitName = unitNewRow.classList.contains('d-none') ? '' : newUnitNameInput.value.trim();
+                        const newUnitAbbr = unitNewRow.classList.contains('d-none') ? '' : newUnitAbbrInput.value.trim();
+                        
+                        if (unit === '__new__' && !unitNewRow.classList.contains('d-none') && newUnitName && newUnitAbbr) {
+                            const unitResult = await Api.call(API_ACTIONS.ADD_UNIT, { 
+                                name: newUnitName, 
+                                abbreviation: newUnitAbbr 
+                            });
+                            if (unitResult.success && unitResult.unit_id) {
+                                unit = newUnitAbbr;
+                            } else {
+                                console.warn('Hiba az új mértékegység mentésekor, alapértelmezett: g');
+                                unit = 'g';
+                            }
+                        }
                         
                         // HA ÚJ HOZZÁVALÓT AKARUNK FELVINNI
-                        if (ingredientId === '__new__') {
+                        if (ingredientId === '__new__' && !newRow.classList.contains('d-none')) {
                             if (!newName) {
                                 console.warn('Kihagyva: Nincs név megadva az új hozzávalónál.');
                                 continue;
@@ -556,48 +576,74 @@ const UI = {
 
         const allIngredients = await Api.call(API_ACTIONS.GET_ALL_INGREDIENTS);
         const ingArray = Array.isArray(allIngredients) ? allIngredients : [];
-
+        
+        const allUnits = await Api.call(API_ACTIONS.GET_ALL_UNITS);
+        const unitArray = Array.isArray(allUnits) ? allUnits : [];
+        
         window.handleIngredientSelect = function(select) {
-            const newInput = select.parentElement.querySelector('.ingredient-new-name');
+            const row = select.closest('.ingredient-row');
+            const newRow = row.querySelector('.ingredient-new-row');
+            const newInput = row.querySelector('.ingredient-new-name');
             if (select.value === '__new__') {
+                newRow.classList.remove('d-none');
                 newInput.classList.remove('d-none');
                 newInput.required = true;
             } else {
+                newRow.classList.add('d-none');
                 newInput.classList.add('d-none');
                 newInput.required = false;
+            }
+        };
+        
+        window.handleUnitSelect = function(select) {
+            const row = select.closest('.ingredient-row');
+            const newRow = row.querySelector('.unit-new-row');
+            const newInput = row.querySelector('.unit-new-name');
+            const newAbbrInput = row.querySelector('.unit-new-abbr');
+            if (select.value === '__new__') {
+                newRow.classList.remove('d-none');
+                newInput.classList.remove('d-none');
+                newAbbrInput.classList.remove('d-none');
+            } else {
+                newRow.classList.add('d-none');
+                newInput.classList.add('d-none');
+                newAbbrInput.classList.add('d-none');
             }
         };
 
         function addIngredientRow() {
             ingredientCount++;
             const options = ingArray.map(i => `<option value="${i.id}">${i.name}</option>`).join('');
+            const unitOptions = unitArray.map(u => `<option value="${u.abbreviation}">${u.abbreviation}</option>`).join('');
+            
             ingredientsList.insertAdjacentHTML('beforeend', `
-                <div class="ingredient-row d-flex gap-2 mb-2 align-items-center fade-in-up">
-                    <select class="form-control ingredient-select" style="flex: 2;" onchange="handleIngredientSelect(this)">
-                        <option value="">Válassz hozzávalót...</option>
-                        ${options}
-                        <option value="__new__">+ Új hozzávaló...</option>
-                    </select>
-                    <input type="text" class="form-control ingredient-new-name d-none" placeholder="Új hozzávaló neve" style="flex: 2;">
-                    <input type="number" class="form-control ingredient-quantity" placeholder="Mennyiség" style="width: 100px;">
-                    <select class="form-control ingredient-unit" style="width: 90px;">
-                        <option value="g">g</option>
-                        <option value="kg">kg</option>
-                        <option value="ml">ml</option>
-                        <option value="l">l</option>
-                        <option value="db">db</option>
-                        <option value="ek">ek</option>
-                        <option value="tk">tk</option>
-                        <option value="csipet">csipet</option>
-                        <option value="szem">szem</option>
-                        <option value="szelet">szelet</option>
-                        <option value="dl">dl</option>
-                    </select>
-                    <button type="button" class="btn btn-outline-danger btn-sm remove-btn px-3">X</button>
+                <div class="ingredient-row fade-in-up mb-3">
+                    <div class="d-flex gap-2 mb-2 align-items-center">
+                        <select class="form-control ingredient-select" style="flex: 2;" onchange="handleIngredientSelect(this)">
+                            <option value="">Válassz hozzávalót...</option>
+                            ${options}
+                            <option value="__new__">+ Új hozzávaló...</option>
+                        </select>
+                        <input type="number" class="form-control ingredient-quantity" placeholder="Mennyiség" style="width: 100px;">
+                        <select class="form-control ingredient-unit" style="width: 90px;" onchange="handleUnitSelect(this)">
+                            ${unitOptions}
+                            <option value="__new__">+ Új...</option>
+                        </select>
+                        <button type="button" class="btn btn-outline-danger btn-sm remove-btn px-3">X</button>
+                    </div>
+                    <div class="ingredient-new-row d-none ps-3 border-start border-2 border-primary">
+                        <input type="text" class="form-control ingredient-new-name mb-2" placeholder="Új hozzávaló neve">
+                    </div>
+                    <div class="unit-new-row d-none ps-3 border-start border-2 border-success">
+                        <div class="d-flex gap-2">
+                            <input type="text" class="form-control unit-new-name" placeholder="Mértékegység neve (pl: evőkanál)" style="flex: 2;">
+                            <input type="text" class="form-control unit-new-abbr" placeholder="Rövidítés (pl: ek)" style="width: 80px;">
+                        </div>
+                    </div>
                 </div>
             `);
             ingredientsList.querySelectorAll('.remove-btn').forEach(btn => {
-                btn.onclick = () => btn.parentElement.remove();
+                btn.onclick = () => btn.parentElement.parentElement.remove();
             });
         }
 

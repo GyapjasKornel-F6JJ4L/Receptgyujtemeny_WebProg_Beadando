@@ -4,15 +4,25 @@ header('Content-Type: application/json; charset=utf-8');
 require_once '../includes/queries.php';
 
 $queryManager = new queries();
-$input = file_get_contents('php://input');
-$request = json_decode($input, true);
 
-if (!$request) {
-    $request = [];
+$action = '';
+$request = [];
+
+// Check if multipart form data (file upload)
+if (!empty($_FILES) || (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'multipart/form-data') !== false)) {
+    // Handle multipart form data
+    $action = $_POST['action'] ?? '';
+    $request = $_POST;
+    $files = $_FILES;
+} else {
+    // Handle JSON request
+    $input = file_get_contents('php://input');
+    $request = json_decode($input, true) ?? [];
+    $action = $request['action'] ?? '';
+    $files = [];
 }
 
 try {
-    $action = $request['action'] ?? '';
 
     // 1. Receptek lekérése (nyilvános lista)
     if ($action === 'get_receipeName') {
@@ -167,13 +177,47 @@ try {
         echo json_encode($data);
     }
 
-    // 14. Kép feltöltése
+    // 14. Mértékegységek lekérése
+    elseif ($action === 'get_all_units') {
+        $data = $queryManager->get_all_units();
+        echo json_encode($data);
+    }
+
+    // 15. Új mértékegység hozzáadása
+    elseif ($action === 'add_unit') {
+        $name = $request['name'] ?? '';
+        $abbreviation = $request['abbreviation'] ?? '';
+        
+        if (empty($name) || empty($abbreviation)) {
+            throw new Exception("A mértékegység neve és rövidítése kötelező!");
+        }
+        
+        $result = $queryManager->addUnit($name, $abbreviation);
+        echo json_encode($result);
+    }
+
+    // 16. Kép feltöltése
     elseif ($action === 'upload_image') {
-        if (!isset($_FILES['image'])) {
+        if (!isset($files['image']) || $files['image']['error'] === UPLOAD_ERR_NO_FILE) {
             throw new Exception("Kép fájl szükséges!");
         }
         
-        $file = $_FILES['image'];
+        $file = $files['image'];
+        
+        // Check for upload errors
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            $uploadErrors = [
+                UPLOAD_ERR_INI_SIZE => 'A fájl túl nagy (szerver limit).',
+                UPLOAD_ERR_FORM_SIZE => 'A fájl túl nagy (űrlap limit).',
+                UPLOAD_ERR_PARTIAL => 'A fájl részlegesen töltődött fel.',
+                UPLOAD_ERR_NO_TMP_DIR => 'Hiányzik az ideiglenes mappa.',
+                UPLOAD_ERR_CANT_WRITE => 'Nem sikerült írni a fájlt.',
+                UPLOAD_ERR_EXTENSION => 'Fájl feltöltés leállítva kiegészítő által.',
+            ];
+            $errorMsg = $uploadErrors[$file['error']] ?? 'Ismeretlen hiba a feltöltéskor.';
+            throw new Exception($errorMsg);
+        }
+        
         $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         
         if (!in_array($file['type'], $allowedTypes)) {
@@ -185,23 +229,34 @@ try {
         }
         
         $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $newFilename = uniqid('recipe_') . '.' . $extension;
+        $newFilename = uniqid('recipe_') . '.' . strtolower($extension);
         $uploadDir = '../uploads/';
         
         if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
+            if (!mkdir($uploadDir, 0777, true)) {
+                throw new Exception("Nem sikerült létrehozni a feltöltési mappát!");
+            }
         }
         
         $targetPath = $uploadDir . $newFilename;
         
-        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+        // Try move_uploaded_file first (for real HTTP uploads)
+        if (is_uploaded_file($file['tmp_name'])) {
+            $moved = move_uploaded_file($file['tmp_name'], $targetPath);
+        } else {
+            // Fallback for non-HTTP uploads (testing)
+            $moved = copy($file['tmp_name'], $targetPath);
+        }
+        
+        if ($moved) {
+            chmod($targetPath, 0644);
             echo json_encode([
                 "success" => true,
                 "filename" => $newFilename,
                 "path" => 'uploads/' . $newFilename
             ]);
         } else {
-            throw new Exception("Hiba a fájl feltöltése során!");
+            throw new Exception("Hiba a fájl mentése során! Ellenőrizd a mappa írási jogait.");
         }
     }
     

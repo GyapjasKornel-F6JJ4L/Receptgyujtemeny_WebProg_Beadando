@@ -18,6 +18,8 @@ const API_ACTIONS = {
     ADD_INGREDIENT: 'add_ingredient',
     GET_CATEGORIES: 'get_categories',
     SEARCH_RECIPES: 'search_recipes',
+    GET_ALL_UNITS: 'get_all_units',
+    ADD_UNIT: 'add_unit',
     LOGIN: 'login',
     REGISTER: 'register'
 };

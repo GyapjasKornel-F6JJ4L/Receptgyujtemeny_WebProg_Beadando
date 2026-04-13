@@ -223,5 +223,31 @@ class queries extends Database
         $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    // 14. Összes mértékegység lekérése
+    public function get_all_units() {
+        $pdo = $this->connect();
+        
+        $sql = $pdo->prepare("SELECT id, name, abbreviation FROM units ORDER BY id");
+        $sql->execute();
+        return $sql->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // 15. Új mértékegység hozzáadása
+    public function addUnit($name, $abbreviation) {
+        $pdo = $this->connect();
+        
+        $check = $pdo->prepare("SELECT id FROM units WHERE name = ? OR abbreviation = ?");
+        $check->execute([$name, $abbreviation]);
+        if ($check->rowCount() > 0) {
+            $existing = $check->fetch();
+            return ["success" => true, "unit_id" => $existing['id'], "message" => "A mértékegység már létezik."];
+        }
+        
+        $sql = $pdo->prepare("INSERT INTO units (name, abbreviation) VALUES (?, ?)");
+        $sql->execute([$name, $abbreviation]);
+        
+        return ["success" => true, "unit_id" => $pdo->lastInsertId()];
+    }
 }
 ?>

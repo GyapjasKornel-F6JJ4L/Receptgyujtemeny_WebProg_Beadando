@@ -48,6 +48,37 @@ INSERT INTO `categories` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `units`
+--
+
+CREATE TABLE `units` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) COLLATE utf8_hungarian_ci NOT NULL,
+  `abbreviation` varchar(20) COLLATE utf8_hungarian_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
+
+--
+-- Dumping data for table `units`
+--
+
+INSERT INTO `units` (`id`, `name`, `abbreviation`) VALUES
+(1, 'gramm', 'g'),
+(2, 'kilogramm', 'kg'),
+(3, 'milliliter', 'ml'),
+(4, 'liter', 'l'),
+(5, 'darab', 'db'),
+(6, 'evőkanál', 'ek'),
+(7, 'teáskanál', 'tk'),
+(8, 'csipet', 'csipet'),
+(9, 'szem', 'szem'),
+(10, 'szelet', 'szelet'),
+(11, 'deciliter', 'dl'),
+(12, 'gerezd', 'gerezd'),
+(13, 'ízlásra', 'ízlásra');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `ingredients`
 --
 
@@ -345,14 +376,17 @@ INSERT INTO `users` (`id`, `username`, `email`, `password`, `created_at`) VALUES
 --
 -- Indexes for table `categories`
 --
-ALTER TABLE `categories`
-  ADD PRIMARY KEY (`id`);
+ALTER TABLE `categories` ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `ingredients`
 --
-ALTER TABLE `ingredients`
-  ADD PRIMARY KEY (`id`);
+ALTER TABLE `ingredients` ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `units`
+--
+ALTER TABLE `units` ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `recipes`
@@ -381,7 +415,7 @@ ALTER TABLE `steps`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `email` (`email`);
 
@@ -400,6 +434,12 @@ ALTER TABLE `categories`
 --
 ALTER TABLE `ingredients`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+
+--
+-- AUTO_INCREMENT for table `units`
+--
+ALTER TABLE `units`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `recipes`
