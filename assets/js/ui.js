@@ -1,13 +1,11 @@
 // UI modul: a felhasználói felület nézeteit készíti el és helyezi be az #app konténerbe.
-// Ez a modul mutatja a főoldalt, bejelentkezési és regisztrációs űrlapokat,
-// és futtatja a backend hívásokat a receptek lekéréséhez.
 const UI = {
     appContainer: document.getElementById('app'),
 
-    // Bejelentkező nézet kirajzolása
+    // --- 1. BEJELENTKEZÉS ---
     renderLogin: async () => {
         UI.appContainer.innerHTML = `
-            <div class="container d-flex justify-content-center align-items-center mt-4">
+            <div class="container d-flex justify-content-center align-items-center mt-4 fade-in-up">
                 <div class="app-card w-100" style="max-width: 420px; padding: 40px;">
                     <h2 class="mb-2 text-center fw-bold" style="color: #2c3e50;">🍽️ ReceptMester</h2>
                     <p class="text-center text-muted fw-bold mb-4">Jelentkezz be a folytatáshoz</p>
@@ -35,10 +33,10 @@ const UI = {
         });
     },
 
-    // Regisztrációs nézet és form eseménykezelés
+    // --- 2. REGISZTRÁCIÓ ---
     renderRegister: async () => {
         UI.appContainer.innerHTML = `
-            <div class="container d-flex justify-content-center align-items-center mt-4">
+            <div class="container d-flex justify-content-center align-items-center mt-4 fade-in-up">
                 <div class="app-card w-100" style="max-width: 420px; padding: 40px;">
                     <h2 class="mb-2 text-center fw-bold" style="color: #2c3e50;">🍽️ ReceptMester</h2>
                     <p class="text-center text-muted fw-bold mb-4">Regisztráció</p>
@@ -81,7 +79,7 @@ const UI = {
         });
     },
 
-    // Főoldal megjelenítése
+    // --- 3. FŐOLDAL ---
     renderHome: async () => {
         let catOptions = `
             <option value="all">Összes kategória</option>
@@ -93,7 +91,7 @@ const UI = {
         `;
 
         UI.appContainer.innerHTML = `
-            <div class="container mt-4">
+            <div class="container mt-4 fade-in-up">
                 <div class="app-card mb-4 p-4">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-6">
@@ -101,7 +99,7 @@ const UI = {
                             <input type="text" id="search-input" class="form-control" placeholder="Recept neve...">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold" style="color: #1e293b;">Kategoria</label>
+                            <label class="form-label fw-bold" style="color: #1e293b;">Kategória</label>
                             <select id="category-select" class="form-control" style="appearance: auto;">
                                 ${catOptions}
                             </select>
@@ -113,9 +111,15 @@ const UI = {
                 </div>
                 
                 <h3 class="mb-4 fw-bold" style="color: #1e293b;">Legfrissebb receptek</h3>
+                
+                <div class="row g-4 mb-4" id="loading">
+                    <div class="col-md-6 col-lg-4"><div class="recipe-card skeleton"><div class="skeleton-img"></div><div class="skeleton-title skeleton"></div><div class="skeleton-text skeleton"></div><div class="skeleton-text skeleton"></div></div></div>
+                    <div class="col-md-6 col-lg-4 d-none d-md-block"><div class="recipe-card skeleton"><div class="skeleton-img"></div><div class="skeleton-title skeleton"></div><div class="skeleton-text skeleton"></div><div class="skeleton-text skeleton"></div></div></div>
+                    <div class="col-md-6 col-lg-4 d-none d-lg-block"><div class="recipe-card skeleton"><div class="skeleton-img"></div><div class="skeleton-title skeleton"></div><div class="skeleton-text skeleton"></div><div class="skeleton-text skeleton"></div></div></div>
+                </div>
+
                 <div class="row g-4" id="recipe-list"></div>
-                <div class="text-center mt-4" id="loading"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Betöltés...</span></div></div>
-                <div class="text-center mt-4 d-none" id="no-recipes"><p class="text-muted">Nincs talalat a megadott kritériumokra.</p><a href="#home" class="btn btn-green" id="reset-filters">Szures torlese</a></div>
+                <div class="text-center mt-4 d-none" id="no-recipes"><p class="text-muted">Nincs találat a megadott kritériumokra.</p><a href="#home" class="btn-gradient px-4 text-decoration-none" id="reset-filters">Szűrés törlése</a></div>
             </div>
         `;
 
@@ -154,7 +158,7 @@ const UI = {
                     return;
                 }
 
-                data.forEach((recipe) => listContainer.insertAdjacentHTML('beforeend', UI.buildRecipeCard(recipe)));
+                data.forEach((recipe, index) => listContainer.insertAdjacentHTML('beforeend', UI.buildRecipeCard(recipe, index)));
             } catch (err) {
                 console.error('Hiba a receptek betöltésénél:', err);
                 if (loading) loading.classList.add('d-none');
@@ -188,7 +192,7 @@ const UI = {
         loadRecipes();
     },
 
-    // Csak a bejelentkezett felhasználó saját receptjei
+    // --- 4. SAJÁT RECEPTEK ---
     renderMyRecipes: async () => {
         const user = Auth.getUser();
         if (!user) {
@@ -206,13 +210,13 @@ const UI = {
         `;
 
         UI.appContainer.innerHTML = `
-            <div class="container mt-4 mb-3">
+            <div class="container mt-4 mb-3 fade-in-up">
                 <div class="top-nav-card py-3 px-4 mx-auto" style="max-width: 900px; margin-top: 0;">
                     <a class="fw-bold text-decoration-none" href="#home" style="color: #334155; font-size: 1.1rem;">⬅ Vissza a főoldalra</a>
                 </div>
             </div>
 
-            <div class="container mt-2 mb-4">
+            <div class="container mt-2 mb-4 fade-in-up" style="animation-delay: 0.1s;">
                 <div class="app-card mb-4 p-4">
                     <div class="row g-3 align-items-end">
                         <div class="col-md-6">
@@ -220,7 +224,7 @@ const UI = {
                             <input type="text" id="my-search-input" class="form-control" placeholder="Recept neve...">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold" style="color: #1e293b;">Kategoria</label>
+                            <label class="form-label fw-bold" style="color: #1e293b;">Kategória</label>
                             <select id="my-category-select" class="form-control" style="appearance: auto;">
                                 ${catOptions}
                             </select>
@@ -232,11 +236,18 @@ const UI = {
                 </div>
 
                 <h3 class="mb-4 fw-bold" style="color: #1e293b;">Saját receptjeim</h3>
+                
+                <div class="row g-4 mb-4" id="my-loading">
+                    <div class="col-md-6 col-lg-4"><div class="recipe-card skeleton"><div class="skeleton-img"></div><div class="skeleton-title skeleton"></div><div class="skeleton-text skeleton"></div><div class="skeleton-text skeleton"></div></div></div>
+                    <div class="col-md-6 col-lg-4 d-none d-md-block"><div class="recipe-card skeleton"><div class="skeleton-img"></div><div class="skeleton-title skeleton"></div><div class="skeleton-text skeleton"></div><div class="skeleton-text skeleton"></div></div></div>
+                    <div class="col-md-6 col-lg-4 d-none d-lg-block"><div class="recipe-card skeleton"><div class="skeleton-img"></div><div class="skeleton-title skeleton"></div><div class="skeleton-text skeleton"></div><div class="skeleton-text skeleton"></div></div></div>
+                </div>
+
                 <div class="row g-4" id="my-recipe-list"></div>
-                <div class="text-center mt-4" id="my-loading"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Betöltés...</span></div></div>
+                
                 <div class="text-center mt-4 d-none" id="my-no-recipes">
-                    <p class="text-muted">Nincs talalat a megadott kritériumokra.</p>
-                    <a href="#add-recipe" class="btn btn-green">Új recept hozzáadása</a>
+                    <p class="text-muted">Nincs találat a megadott kritériumokra.</p>
+                    <a href="#add-recipe" class="btn-gradient px-4 text-decoration-none">Új recept hozzáadása</a>
                 </div>
             </div>
         `;
@@ -277,7 +288,7 @@ const UI = {
                     return;
                 }
 
-                data.forEach((recipe) => listContainer.insertAdjacentHTML('beforeend', UI.buildRecipeCard(recipe)));
+                data.forEach((recipe, index) => listContainer.insertAdjacentHTML('beforeend', UI.buildRecipeCard(recipe, index)));
             } catch (err) {
                 console.error('Hiba a receptek betöltésénél:', err);
                 if (loading) loading.classList.add('d-none');
@@ -302,35 +313,37 @@ const UI = {
         loadMyRecipes();
     },
 
-    // Recepteket megjelenítő kártya HTML sablonja
-    buildRecipeCard: (recipe = {}) => {
+    // --- 5. KÁRTYA SABLON GENERÁLÓ ---
+    buildRecipeCard: (recipe = {}, index = 0) => {
         const id = recipe.id ?? '0';
 
-        // --- OKOS KÉPVÁLASZTÓ KATEGÓRIA ALAPJÁN ---
-        let placeholderImg = 'uploads/husleves.jpg';
-        if (recipe.type === "Desszert" || recipe.type === "Desszertek") {
-            placeholderImg = 'uploads/palacsinta.jpg';
-        } else if (recipe.type === "Előétel" || recipe.type === "Levesek") {
-            placeholderImg = 'uploads/lecsos.jpg';
-        }
+        let placeholderImg = 'uploads/husleves.webp';
+        if (recipe.type === "Desszert" || recipe.type === "Desszertek") placeholderImg = 'uploads/palacsinta.jpg';
+        else if (recipe.type === "Előétel" || recipe.type === "Levesek") placeholderImg = 'uploads/gulyasleves.webp';
 
         const img = recipe.image || placeholderImg;
         const title = recipe.title || 'Ismeretlen recept';
         const desc = recipe.description || 'Leírás nem elérhető.';
         
-        let badgeHtml = `<span class="badge bg-secondary mb-3 d-inline-block px-3 py-1">${recipe.type || 'Recept'}</span>`;
-        if(recipe.type === "Főétel" || recipe.type === "Főételek") badgeHtml = `<span class="badge-foetel mb-3 d-inline-block">Főétel</span>`;
-        if(recipe.type === "Desszert" || recipe.type === "Desszertek") badgeHtml = `<span class="badge-desszert mb-3 d-inline-block">Desszert</span>`;
-        if(recipe.type === "Levesek" || recipe.type === "Előétel") badgeHtml = `<span class="badge bg-success mb-3 d-inline-block px-3 py-1">${recipe.type}</span>`;
+        let dotClass = 'bg-secondary';
+        if(recipe.type === "Főétel" || recipe.type === "Főételek") dotClass = 'dot-foetel';
+        if(recipe.type === "Desszert" || recipe.type === "Desszertek") dotClass = 'dot-desszert';
+        if(recipe.type === "Levesek" || recipe.type === "Előétel") dotClass = 'dot-leves';
+
+        const animationDelay = (index * 0.1) + 's';
 
         return `
-            <div class="col-md-4">
-                <div class="recipe-card">
-                    <img src="${img}" alt="${title}">
+            <div class="col-md-6 col-lg-4 fade-in-up" style="animation-delay: ${animationDelay};">
+                <div class="recipe-card" onclick="window.location.hash='#recipe/${id}'">
+                    <div class="recipe-image-wrapper" style="background-color: #e2e8f0;">
+                        <img src="${img}" alt="${title}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.opacity='0'">
+                    </div>
                     <div class="card-body p-4 d-flex flex-column">
-                        ${badgeHtml}
-                        <h4 class="card-title fw-bold" style="color: #1e293b;">${title}</h4>
-                        <p class="card-text mt-2 text-truncate" style="color: #64748b; max-height: 4.8em;">${desc}</p>
+                        <div class="mb-3">
+                            <span class="badge-modern"><span class="dot ${dotClass}"></span>${recipe.type || 'Recept'}</span>
+                        </div>
+                        <h4 class="card-title fw-bold mb-2" style="font-size: 1.25rem;">${title}</h4>
+                        <p class="card-text text-muted mb-4" style="line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${desc}</p>
                         <a href="#recipe/${id}" class="btn-gradient mt-auto w-100 text-center text-decoration-none">Megnézem</a>
                     </div>
                 </div>
@@ -338,12 +351,12 @@ const UI = {
         `;
     },
 
-    // Új recept oldal
+    // --- 6. ÚJ RECEPT FELVITELE (HANGOS HIBAKERESŐVEL) ---
     renderAddRecipe: async () => {
         const user = Auth.getUser();
         if (!user) {
             UI.appContainer.innerHTML = `
-                <div class="container d-flex justify-content-center align-items-center mt-4">
+                <div class="container d-flex justify-content-center align-items-center mt-4 fade-in-up">
                     <div class="app-card text-center" style="max-width: 500px;">
                         <p class="fs-5 text-muted mb-4">Be kell jelentkezned ahhoz, hogy receptet adhass hozzá.</p>
                         <a href="#login" class="btn-gradient w-100 text-decoration-none d-block">Bejelentkezés</a>
@@ -354,13 +367,13 @@ const UI = {
         }
 
         UI.appContainer.innerHTML = `
-            <div class="container mt-4 mb-3">
+            <div class="container mt-4 mb-3 fade-in-up">
                 <div class="top-nav-card py-3 px-4 mx-auto" style="max-width: 700px; margin-top: 0;">
                     <a class="fw-bold text-decoration-none" href="#home" style="color: #334155; font-size: 1.1rem;">⬅ Vissza a főoldalra</a>
                 </div>
             </div>
 
-            <div class="container mb-5">
+            <div class="container mb-5 fade-in-up" style="animation-delay: 0.1s;">
                 <div class="app-card mx-auto" style="max-width: 700px; padding: 40px;">
                     <h2 class="mb-4 fw-bold text-center" style="color: #1e293b;">✍️ Új Recept Felvitele</h2>
                     
@@ -371,12 +384,12 @@ const UI = {
                         </div>
 
                         <div class="mb-4">
-                            <label for="recipe-category" class="form-label fw-bold" style="color: #1e293b; font-size: 0.95rem;">Kategoria</label>
+                            <label for="recipe-category" class="form-label fw-bold" style="color: #1e293b; font-size: 0.95rem;">Kategória</label>
                             <select class="form-control" id="recipe-category" style="appearance: auto;">
                                 <option value="1">Levesek</option>
-                                <option value="2">Foetelek</option>
+                                <option value="2">Főételek</option>
                                 <option value="3">Desszertek</option>
-                                <option value="4">Salatak</option>
+                                <option value="4">Saláták</option>
                                 <option value="5">Reggelik</option>
                             </select>
                         </div>
@@ -388,22 +401,22 @@ const UI = {
                         </div>
                         
                         <div class="mb-5">
-                            <label for="recipe-description" class="form-label fw-bold" style="color: #1e293b; font-size: 0.95rem;">Elkeszites leirasa</label>
-                            <textarea class="form-control" id="recipe-description" rows="4" placeholder="Rovid leiras a receptrol..."></textarea>
+                            <label for="recipe-description" class="form-label fw-bold" style="color: #1e293b; font-size: 0.95rem;">Elkészítés rövid leírása</label>
+                            <textarea class="form-control" id="recipe-description" rows="4" placeholder="Rövid kedvcsináló a receptről..."></textarea>
                         </div>
 
                         <hr class="my-4">
-                        <h4 class="mb-3 fw-bold" style="color: #1e293b;">Hozzavalok</h4>
+                        <h4 class="mb-3 fw-bold" style="color: #1e293b;">Hozzávalók</h4>
                         <div id="ingredients-list" class="mb-3"></div>
-                        <button type="button" id="add-ingredient-btn" class="btn btn-outline-secondary btn-sm mb-4">+ Hozzavaló hozzáadása</button>
+                        <button type="button" id="add-ingredient-btn" class="btn btn-outline-secondary btn-sm mb-4">+ Hozzávaló hozzáadása</button>
 
                         <hr class="my-4">
-                        <h4 class="mb-3 fw-bold" style="color: #1e293b;">Lepesek</h4>
+                        <h4 class="mb-3 fw-bold" style="color: #1e293b;">Lépések</h4>
                         <div id="steps-list" class="mb-3"></div>
                         <button type="button" id="add-step-btn" class="btn btn-outline-secondary btn-sm mb-4">+ Lépés hozzáadása</button>
                         
                         <div class="d-grid gap-2 mt-2">
-                            <button type="submit" class="btn-gradient py-3">MENTES AZ ADATBAZISBA</button>
+                            <button type="submit" class="btn-gradient py-3">MENTÉS AZ ADATBÁZISBA</button>
                         </div>
                     </form>
                 </div>
@@ -444,11 +457,12 @@ const UI = {
             }
 
             if (!title) {
-                alert('A recept neve Kotelezo!');
+                alert('A recept neve Kötelező!');
                 return;
             }
 
             try {
+                // RECEPT MENTÉSE
                 const result = await Api.call(API_ACTIONS.ADD_RECIPE, {
                     user_id: user.id,
                     title,
@@ -460,37 +474,58 @@ const UI = {
                 if (result.success) {
                     const recipeId = result.recipe_id;
 
+                    // --- JAVÍTOTT ÉS BIZTOSÍTOTT HOZZÁVALÓ FELDOLGOZÁS ---
                     const ingredientRows = document.querySelectorAll('.ingredient-row');
-                    let newIngCache = ingArray;
                     
                     for (const row of ingredientRows) {
                         const selectEl = row.querySelector('.ingredient-select');
                         let ingredientId = selectEl.value;
+                        
                         const newNameInput = row.querySelector('.ingredient-new-name');
                         const newName = newNameInput.value.trim();
+                        
                         const quantity = row.querySelector('.ingredient-quantity').value;
                         const unit = row.querySelector('.ingredient-unit').value;
                         
-                        if (newName && quantity && !ingredientId) {
+                        // HA ÚJ HOZZÁVALÓT AKARUNK FELVINNI
+                        if (ingredientId === '__new__') {
+                            if (!newName) {
+                                console.warn('Kihagyva: Nincs név megadva az új hozzávalónál.');
+                                continue;
+                            }
+                            if (!quantity) {
+                                alert(`Kérlek adj meg mennyiséget ehhez: ${newName}!`);
+                                continue;
+                            }
+
+                            // Kérjük meg a szervert, hogy mentse el az új hozzávalót
                             const newResult = await Api.call(API_ACTIONS.ADD_INGREDIENT, { name: newName });
-                            if (newResult.success) {
-                                const all = await Api.call(API_ACTIONS.GET_ALL_INGREDIENTS);
-                                newIngCache = Array.isArray(all) ? all : [];
-                                const found = newIngCache.find(i => i.name.toLowerCase() === newName.toLowerCase());
-                                ingredientId = found ? found.id : newResult.ingredient_id;
+                            
+                            if (newResult.success && newResult.ingredient_id) {
+                                ingredientId = newResult.ingredient_id; // Sikerült, megkaptuk az új ID-t!
+                            } else {
+                                alert(`Hiba a(z) "${newName}" mentésekor a szerveren: ` + (newResult.error || 'Ismeretlen hiba'));
+                                continue; 
                             }
                         }
                         
-                        if (ingredientId && quantity) {
-                            await Api.call(API_ACTIONS.ADD_RECIPE_INGREDIENT, {
+                        // HA MEGVAN AZ ID (akár régi, akár frissen mentett) ÉS VAN MENNYISÉG, CSATOLJUK!
+                        if (ingredientId && ingredientId !== '__new__' && quantity) {
+                            const linkResult = await Api.call(API_ACTIONS.ADD_RECIPE_INGREDIENT, {
                                 recipe_id: recipeId,
                                 ingredient_id: ingredientId,
                                 quantity: quantity,
                                 unit: unit
                             });
+
+                            if (linkResult.error) {
+                                alert(`Hiba a hozzávaló recepthez csatolásakor: ` + linkResult.error);
+                            }
                         }
                     }
+                    // --- HOZZÁVALÓ MENTÉS VÉGE ---
 
+                    // --- LÉPÉSEK MENTÉSE ---
                     const stepRows = document.querySelectorAll('.step-row');
                     for (let i = 0; i < stepRows.length; i++) {
                         const desc = stepRows[i].querySelector('.step-description').value;
@@ -503,14 +538,14 @@ const UI = {
                         }
                     }
 
-                    alert('Recept sikeresen hozzaadva!');
+                    alert('Recept sikeresen hozzáadva!');
                     window.location.hash = '#home';
                 } else {
-                    alert(result.error || 'Hiba a recept hozzaadasakor');
+                    alert(result.error || 'Hiba a recept hozzáadásakor');
                 }
             } catch (error) {
                 console.error('Hiba:', error);
-                alert('Szerverhiba tortent');
+                alert('Szerverhiba történt');
             }
         });
 
@@ -533,27 +568,18 @@ const UI = {
             }
         };
 
-        async function createNewIngredient(name) {
-            const result = await Api.call(API_ACTIONS.ADD_INGREDIENT, { name: name });
-            if (result.success) {
-                const newIng = await Api.call(API_ACTIONS.GET_ALL_INGREDIENTS);
-                return { array: Array.isArray(newIng) ? newIng : [], newId: result.ingredient_id };
-            }
-            return { array: ingArray, newId: null };
-        }
-
         function addIngredientRow() {
             ingredientCount++;
             const options = ingArray.map(i => `<option value="${i.id}">${i.name}</option>`).join('');
             ingredientsList.insertAdjacentHTML('beforeend', `
-                <div class="ingredient-row d-flex gap-2 mb-2 align-items-center">
+                <div class="ingredient-row d-flex gap-2 mb-2 align-items-center fade-in-up">
                     <select class="form-control ingredient-select" style="flex: 2;" onchange="handleIngredientSelect(this)">
-                        <option value="">Valassz hozzavalot...</option>
+                        <option value="">Válassz hozzávalót...</option>
                         ${options}
-                        <option value="__new__">+ Uj hozzavalo...</option>
+                        <option value="__new__">+ Új hozzávaló...</option>
                     </select>
-                    <input type="text" class="form-control ingredient-new-name d-none" placeholder="Uj hozzavalo neve" style="flex: 2;">
-                    <input type="number" class="form-control ingredient-quantity" placeholder="Mennyiseg" style="width: 80px;">
+                    <input type="text" class="form-control ingredient-new-name d-none" placeholder="Új hozzávaló neve" style="flex: 2;">
+                    <input type="number" class="form-control ingredient-quantity" placeholder="Mennyiség" style="width: 100px;">
                     <select class="form-control ingredient-unit" style="width: 90px;">
                         <option value="g">g</option>
                         <option value="kg">kg</option>
@@ -567,7 +593,7 @@ const UI = {
                         <option value="szelet">szelet</option>
                         <option value="dl">dl</option>
                     </select>
-                    <button type="button" class="btn btn-outline-danger btn-sm remove-btn">X</button>
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-btn px-3">X</button>
                 </div>
             `);
             ingredientsList.querySelectorAll('.remove-btn').forEach(btn => {
@@ -578,10 +604,10 @@ const UI = {
         function addStepRow() {
             stepCount++;
             stepsList.insertAdjacentHTML('beforeend', `
-                <div class="step-row d-flex gap-2 mb-2">
-                    <span class="badge bg-secondary" style="align-self: center;">${stepCount}</span>
-                    <textarea class="form-control step-description" placeholder="Ennek a lepesnek a leirasa..." rows="2"></textarea>
-                    <button type="button" class="btn btn-outline-danger btn-sm remove-btn">X</button>
+                <div class="step-row d-flex gap-2 mb-2 fade-in-up">
+                    <span class="badge bg-secondary" style="align-self: center; font-size:1.1rem; padding: 10px 14px; border-radius:8px;">${stepCount}</span>
+                    <textarea class="form-control step-description" placeholder="Ennek a lépésnek a leírása..." rows="2"></textarea>
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-btn px-3">X</button>
                 </div>
             `);
             stepsList.querySelectorAll('.remove-btn').forEach(btn => {
@@ -608,16 +634,16 @@ const UI = {
         addStepRow();
     },
 
-    // Recept részleteinek lekérése és megjelenítése
+    // --- 7. RECEPT RÉSZLETEI ---
     renderRecipeDetails: async (id) => {
         UI.appContainer.innerHTML = `
-            <div class="container mt-4 mb-3">
+            <div class="container mt-4 mb-3 fade-in-up">
                 <div class="top-nav-card py-3 px-4 mx-auto" style="max-width: 800px; margin-top: 0;">
                     <a class="fw-bold text-decoration-none" href="#home" style="color: #334155; font-size: 1.1rem;">⬅ Vissza a listához</a>
                 </div>
             </div>
             <div class="container mb-5" id="recipe-content">
-                <div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>
+                <div class="app-card mx-auto p-0 overflow-hidden skeleton" style="max-width: 800px; height: 600px;"></div>
             </div>
         `;
 
@@ -636,20 +662,18 @@ const UI = {
 
         const categoryName = data.category || 'Recept';
 
-        // --- OKOS KÉPVÁLASZTÓ A RÉSZLETEK OLDALRA IS ---
-        let placeholderImg = 'uploads/husleves.jpg';
-        if (categoryName === "Desszert" || categoryName === "Desszertek") {
-            placeholderImg = 'uploads/palacsinta.jpg';
-        } else if (categoryName === "Előétel" || categoryName === "Levesek") {
-            placeholderImg = 'uploads/lecsos.jpg';
-        }
+        let placeholderImg = 'uploads/husleves.webp';
+        if (categoryName === "Desszert" || categoryName === "Desszertek") placeholderImg = 'uploads/palacsinta.jpg';
+        else if (categoryName === "Előétel" || categoryName === "Levesek") placeholderImg = 'uploads/gulyasleves.webp';
 
         const imgUrl = data.image || placeholderImg;
         
-        let badgeHtml = `<span class="badge bg-secondary mb-3 px-3 py-2">${categoryName}</span>`;
-        if(categoryName === "Főétel" || categoryName === "Főételek") badgeHtml = `<span class="badge-foetel mb-3 d-inline-block px-3 py-2">Főétel</span>`;
-        if(categoryName === "Desszert" || categoryName === "Desszertek") badgeHtml = `<span class="badge-desszert mb-3 d-inline-block px-3 py-2">Desszert</span>`;
-        if(categoryName === "Levesek" || categoryName === "Előétel") badgeHtml = `<span class="badge bg-success mb-3 d-inline-block px-3 py-2">${categoryName}</span>`;
+        let dotClass = 'bg-secondary';
+        if(categoryName === "Főétel" || categoryName === "Főételek") dotClass = 'dot-foetel';
+        if(categoryName === "Desszert" || categoryName === "Desszertek") dotClass = 'dot-desszert';
+        if(categoryName === "Levesek" || categoryName === "Előétel") dotClass = 'dot-leves';
+
+        const badgeHtml = `<span class="badge-modern"><span class="dot ${dotClass}"></span>${categoryName}</span>`;
 
         const recipeIdNum = parseInt(id, 10);
         
@@ -661,64 +685,61 @@ const UI = {
 
         let ingredientsHtml = '';
         if (ingsArray.length > 0) {
-            ingredientsHtml = '<table class="table table-hover"><thead><tr><th>Hozzavaló</th><th class="text-end">Mennyiség</th></tr></thead><tbody>';
+            ingredientsHtml = '<table class="table table-hover mt-3"><thead><tr><th>Hozzávaló</th><th class="text-end">Mennyiség</th></tr></thead><tbody>';
             for (const ing of ingsArray) {
                 ingredientsHtml += `<tr>
-                    <td>${ing.ingredient_name || 'Ismeretlen'}</td>
-                    <td class="text-end"><span class="badge bg-primary">${ing.quantity} ${ing.unit}</span></td>
+                    <td class="fw-bold" style="color: #475569;">${ing.ingredient_name || 'Ismeretlen'}</td>
+                    <td class="text-end"><span class="badge bg-secondary px-3 py-2" style="font-size: 0.9rem;">${ing.quantity} ${ing.unit}</span></td>
                 </tr>`;
             }
             ingredientsHtml += '</tbody></table>';
         } else {
-            ingredientsHtml = '<p class="text-muted">Nincs hozzavaló megadva.</p>';
+            ingredientsHtml = '<p class="text-muted">Nincs hozzávaló megadva.</p>';
         }
 
         let stepsHtml = '';
         if (stepsArray.length > 0) {
-            stepsHtml = '<div class="steps-list">';
+            stepsHtml = '<div class="steps-list mt-4">';
             for (const step of stepsArray) {
                 stepsHtml += `
-                <div class="accordion-item border-0 mb-2">
-                    <h5 class="accordion-header">
-                        <span class="badge bg-success me-2">${step.step_number}</span>${step.description}
-                    </h5>
+                <div class="d-flex mb-4 p-3 rounded" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <div class="me-4 flex-shrink-0">
+                        <div class="d-flex align-items-center justify-content-center bg-dark text-white rounded-circle fw-bold" style="width: 40px; height: 40px; font-size: 1.2rem;">${step.step_number}</div>
+                    </div>
+                    <div class="pt-2" style="line-height: 1.7; color: #334155;">
+                        ${step.description}
+                    </div>
                 </div>`;
             }
             stepsHtml += '</div>';
         } else {
-            stepsHtml = '<p class="text-muted">Nincs lepes megadva.</p>';
+            stepsHtml = '<p class="text-muted">Nincs lépés megadva.</p>';
         }
 
         const createdAt = data.created_at ? new Date(data.created_at).toLocaleDateString('hu-HU') : 'Nincs megadva';
-        const firstMade = data.first_made ? new Date(data.first_made).toLocaleDateString('hu-HU') : 'Nincs megadva';
 
         container.innerHTML = `
-            <div class="app-card mx-auto p-0 overflow-hidden text-start" style="max-width: 800px;">
-                <img src="${imgUrl}" alt="${data.title}" class="w-100" style="height: 400px; object-fit: cover;">
+            <div class="app-card mx-auto p-0 overflow-hidden text-start fade-in-up" style="max-width: 800px;">
+                <div style="background-color: #e2e8f0;">
+                    <img src="${imgUrl}" alt="${data.title}" class="w-100" style="height: 450px; object-fit: cover;" onerror="this.style.opacity='0'">
+                </div>
                 
                 <div class="p-5">
-                    ${badgeHtml}
-                    <h1 class="fw-bold mb-2" style="color: #1e293b; font-size: 2.5rem;">${data.title}</h1>
-                    <p class="text-muted mb-4" style="font-size: 0.95rem;">
-                        <strong>Feltöltötte:</strong> ${data.author || 'Ismeretlen'} | 
-                        <strong>Létrehozva:</strong> ${createdAt} | 
-                        <strong>Elkészítve:</strong> ${firstMade}
+                    <div class="mb-3">${badgeHtml}</div>
+                    <h1 class="fw-bold mb-3" style="color: #0f172a; font-size: 2.8rem; letter-spacing: -1px;">${data.title}</h1>
+                    <p class="text-muted mb-4 pb-3 border-bottom" style="font-size: 1rem;">
+                        <span class="me-3">👨‍🍳 <strong>Feltöltötte:</strong> ${data.author || 'Ismeretlen'}</span>
+                        <span>📅 <strong>Létrehozva:</strong> ${createdAt}</span>
                     </p>
 
-                    <hr style="border-color: #e2e8f0; margin-bottom: 2rem;">
-
                     ${data.description ? `
-                    <h4 class="fw-bold mt-4 mb-3" style="color: #b91c1c;">Rovid leiras</h4>
-                    <p class="mb-4" style="line-height: 1.8;">${data.description}</p>
-                    <hr style="border-color: #e2e8f0; margin-bottom: 2rem;">
+                    <p class="mb-5 text-muted" style="line-height: 1.8; font-size: 1.1rem; border-left: 4px solid var(--accent); padding-left: 15px;">${data.description}</p>
                     ` : ''}
                     
-                    <h4 class="fw-bold mt-4 mb-3" style="color: #b91c1c;">Hozzavalok</h4>
+                    <h3 class="fw-bold mt-5 mb-4" style="color: #0f172a;">🛒 Hozzávalók</h3>
                     ${ingredientsHtml}
                     
-                    <hr style="border-color: #e2e8f0; margin-bottom: 2rem;">
-                    
-                    <h4 class="fw-bold mt-4 mb-3" style="color: #b91c1c;">Elkeszites lepesei</h4>
+                    <h3 class="fw-bold mt-5 mb-4" style="color: #0f172a;">📝 Elkészítés lépései</h3>
                     ${stepsHtml}
                 </div>
             </div>
