@@ -249,5 +249,43 @@ class queries extends Database
         
         return ["success" => true, "unit_id" => $pdo->lastInsertId()];
     }
+    // 16. Recept törlése
+    public function deleteRecipe($recipeId, $userId) {
+        $pdo = $this->connect();
+        // Ellenőrizzük, hogy tényleg az övé-e
+        $check = $pdo->prepare("SELECT id FROM recipes WHERE id = ? AND user_id = ?");
+        $check->execute([$recipeId, $userId]);
+        if ($check->rowCount() === 0) throw new Exception("Nincs jogosultságod törölni ezt a receptet!");
+        
+        // A CASCADE miatt a lépések és hozzávalók is automatikusan törlődnek
+        $sql = $pdo->prepare("DELETE FROM recipes WHERE id = ?");
+        $sql->execute([$recipeId]);
+        return ["success" => true, "message" => "Recept törölve!"];
+    }
+
+    // 17. Recept alapadatai frissítése
+    public function updateRecipeBasic($recipeId, $userId, $title, $description, $categoryId, $image) {
+        $pdo = $this->connect();
+        $check = $pdo->prepare("SELECT id FROM recipes WHERE id = ? AND user_id = ?");
+        $check->execute([$recipeId, $userId]);
+        if ($check->rowCount() === 0) throw new Exception("Nincs jogosultságod módosítani ezt a receptet!");
+
+        if ($image) {
+            $sql = $pdo->prepare("UPDATE recipes SET title=?, description=?, category_id=?, image=? WHERE id=?");
+            $sql->execute([$title, $description, $categoryId, $image, $recipeId]);
+        } else {
+            $sql = $pdo->prepare("UPDATE recipes SET title=?, description=?, category_id=? WHERE id=?");
+            $sql->execute([$title, $description, $categoryId, $recipeId]);
+        }
+        return ["success" => true];
+    }
+
+    // 18. Recept hozzávalók és lépések ürítése (módosításkor újraírjuk őket)
+    public function clearRecipeDetails($recipeId) {
+        $pdo = $this->connect();
+        $pdo->prepare("DELETE FROM recipe_ingredients WHERE recipe_id=?")->execute([$recipeId]);
+        $pdo->prepare("DELETE FROM steps WHERE recipe_id=?")->execute([$recipeId]);
+        return ["success" => true];
+    }
 }
 ?>

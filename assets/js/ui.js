@@ -85,7 +85,7 @@ const UI = {
 
             Auth.register(username, password, email);
         });
-    }, // <-- EZ A LEZÁRÁS HIÁNYZOTT!
+    },
 
     // --- 3. FŐOLDAL ---
     renderHome: async () => {
@@ -296,7 +296,7 @@ const UI = {
                     return;
                 }
 
-                data.forEach((recipe, index) => listContainer.insertAdjacentHTML('beforeend', UI.buildRecipeCard(recipe, index)));
+                data.forEach((recipe, index) => listContainer.insertAdjacentHTML('beforeend', UI.buildRecipeCard(recipe, index, true)));
             } catch (err) {
                 console.error('Hiba a receptek betöltésénél:', err);
                 if (loading) loading.classList.add('d-none');
@@ -322,9 +322,8 @@ const UI = {
     },
 
     // --- 5. KÁRTYA SABLON GENERÁLÓ ---
-    buildRecipeCard: (recipe = {}, index = 0) => {
+    buildRecipeCard: (recipe = {}, index = 0, isMyRecipe = false) => {
         const id = recipe.id ?? '0';
-
         let placeholderImg = 'uploads/husleves.webp';
         if (recipe.type === "Desszert" || recipe.type === "Desszertek") placeholderImg = 'uploads/palacsinta.jpg';
         else if (recipe.type === "Előétel" || recipe.type === "Levesek") placeholderImg = 'uploads/gulyasleves.webp';
@@ -340,9 +339,19 @@ const UI = {
 
         const animationDelay = (index * 0.1) + 's';
 
+        // Ha a saját receptünk, akkor Szerkesztés/Törlés gombok jönnek
+        const buttonsHtml = isMyRecipe ? `
+            <div class="d-flex gap-2 mt-auto">
+                <button onclick="event.stopPropagation(); window.location.hash='#edit-recipe/${id}'" class="btn btn-warning flex-fill fw-bold text-white">Szerkesztés</button>
+                <button onclick="event.stopPropagation(); UI.deleteRecipe(${id})" class="btn btn-danger flex-fill fw-bold">Törlés</button>
+            </div>
+        ` : `
+            <a href="#recipe/${id}" class="btn-gradient mt-auto w-100 text-center text-decoration-none">Megnézem</a>
+        `;
+
         return `
             <div class="col-md-6 col-lg-4 fade-in-up" style="animation-delay: ${animationDelay};">
-                <div class="recipe-card" onclick="window.location.hash='#recipe/${id}'">
+                <div class="recipe-card" onclick="window.location.hash='#recipe/${id}'" style="cursor:pointer;">
                     <div class="recipe-image-wrapper" style="background-color: #e2e8f0; height: 220px; width: 100%; overflow: hidden;">
                         <img src="${img}" alt="${title}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.opacity='0'">
                     </div>
@@ -352,14 +361,14 @@ const UI = {
                         </div>
                         <h4 class="card-title fw-bold mb-2" style="font-size: 1.25rem;">${title}</h4>
                         <p class="card-text text-muted mb-4" style="line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${desc}</p>
-                        <a href="#recipe/${id}" class="btn-gradient mt-auto w-100 text-center text-decoration-none">Megnézem</a>
+                        ${buttonsHtml}
                     </div>
                 </div>
             </div>
         `;
     },
 
-    // --- 6. ÚJ RECEPT FELVITELE (HANGOS HIBAKERESŐVEL) ---
+    // --- 6. ÚJ RECEPT FELVITELE ---
     renderAddRecipe: async () => {
         const user = Auth.getUser();
         if (!user) {
@@ -482,7 +491,6 @@ const UI = {
                 if (result.success) {
                     const recipeId = result.recipe_id;
 
-                    // --- JAVÍTOTT ÉS BIZTOSÍTOTT HOZZÁVALÓ FELDOLGOZÁS ---
                     const ingredientRows = document.querySelectorAll('.ingredient-row');
 
                     for (const row of ingredientRows) {
@@ -515,10 +523,8 @@ const UI = {
                             }
                         }
 
-                        // HA ÚJ HOZZÁVALÓT AKARUNK FELVINNI
                         if (ingredientId === '__new__' && !newRow.classList.contains('d-none')) {
                             if (!newName) {
-                                console.warn('Kihagyva: Nincs név megadva az új hozzávalónál.');
                                 continue;
                             }
                             if (!quantity) {
@@ -526,7 +532,6 @@ const UI = {
                                 continue;
                             }
 
-                            // Kérjük meg a szervert, hogy mentse el az új hozzávalót
                             const newResult = await Api.call(API_ACTIONS.ADD_INGREDIENT, { name: newName });
 
                             if (newResult.success && newResult.ingredient_id) {
@@ -537,7 +542,6 @@ const UI = {
                             }
                         }
 
-                        // HA MEGVAN AZ ID (akár régi, akár frissen mentett) ÉS VAN MENNYISÉG, CSATOLJUK!
                         if (ingredientId && ingredientId !== '__new__' && quantity) {
                             const linkResult = await Api.call(API_ACTIONS.ADD_RECIPE_INGREDIENT, {
                                 recipe_id: recipeId,
@@ -551,9 +555,7 @@ const UI = {
                             }
                         }
                     }
-                    // --- HOZZÁVALÓ MENTÉS VÉGE ---
 
-                    // --- LÉPÉSEK MENTÉSE ---
                     const stepRows = document.querySelectorAll('.step-row');
                     for (let i = 0; i < stepRows.length; i++) {
                         const desc = stepRows[i].querySelector('.step-description').value;
@@ -798,5 +800,226 @@ const UI = {
                 </div>
             </div>
         `;
+    },
+
+    // --- 8. RECEPT TÖRLÉSE ---
+    deleteRecipe: async (id) => {
+        if (!confirm('Biztosan törölni szeretnéd ezt a receptet? Ez a művelet nem vonható vissza!')) return;
+        const user = Auth.getUser();
+        const res = await Api.call(API_ACTIONS.DELETE_RECIPE, { recipe_id: id, user_id: user.id });
+        if (res.success) {
+            alert('Recept sikeresen törölve!');
+            const hash = window.location.hash; window.location.hash = ''; setTimeout(() => window.location.hash = hash, 10);
+        } else { alert('Hiba a törlés során: ' + res.error); }
+    },
+
+    // --- 9. RECEPT SZERKESZTÉSE ---
+    renderEditRecipe: async (id) => {
+        const user = Auth.getUser();
+        if (!user) { window.location.hash = '#login'; return; }
+
+        // Adatok betöltése
+        const data = await Api.call(API_ACTIONS.GET_RECIPE_DETAILS, { id });
+        if (data.error || data.user_id != user.id) {
+            UI.appContainer.innerHTML = `<div class="container mt-5"><div class="alert alert-danger">Nincs jogosultságod, vagy a recept nem található!</div></div>`;
+            return;
+        }
+
+        const recipeIdNum = parseInt(id, 10);
+        const ings = await Api.call('get_recipe_ingredients', { recipe_id: recipeIdNum });
+        const steps = await Api.call('get_recipe_steps', { recipe_id: recipeIdNum });
+
+        UI.appContainer.innerHTML = `
+            <div class="container mt-4 mb-3 fade-in-up">
+                <div class="top-nav-card py-3 px-4 mx-auto" style="max-width: 700px; margin-top: 0;">
+                    <a class="fw-bold text-decoration-none" href="#my-recipes" style="color: #334155; font-size: 1.1rem;">⬅ Vissza a saját receptekhez</a>
+                </div>
+            </div>
+
+            <div class="container mb-5 fade-in-up" style="animation-delay: 0.1s;">
+                <div class="app-card mx-auto" style="max-width: 700px; padding: 40px;">
+                    <h2 class="mb-4 fw-bold text-center" style="color: #1e293b;">✏️ Recept Módosítása</h2>
+                    
+                    <form id="edit-recipe-form">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Recept neve</label>
+                            <input type="text" class="form-control" id="recipe-title" value="${data.title}" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Kategória</label>
+                            <select class="form-control" id="recipe-category">
+                                <option value="1" ${data.category_id == 1 ? 'selected' : ''}>Levesek</option>
+                                <option value="2" ${data.category_id == 2 ? 'selected' : ''}>Főételek</option>
+                                <option value="3" ${data.category_id == 3 ? 'selected' : ''}>Desszertek</option>
+                                <option value="4" ${data.category_id == 4 ? 'selected' : ''}>Saláták</option>
+                                <option value="5" ${data.category_id == 5 ? 'selected' : ''}>Reggelik</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Kép módosítása (hagyd üresen, ha marad a régi)</label>
+                            <input type="file" class="form-control" id="recipe-image-file" accept="image/*">
+                            <input type="hidden" id="recipe-image" value="${data.image || ''}">
+                        </div>
+                        <div class="mb-5">
+                            <label class="form-label fw-bold">Elkészítés rövid leírása</label>
+                            <textarea class="form-control" id="recipe-description" rows="4">${data.description || ''}</textarea>
+                        </div>
+                        <hr class="my-4">
+                        <h4 class="mb-3 fw-bold">Hozzávalók</h4>
+                        <div id="ingredients-list" class="mb-3"></div>
+                        <button type="button" id="add-ingredient-btn" class="btn btn-outline-secondary btn-sm mb-4">+ Hozzávaló hozzáadása</button>
+
+                        <hr class="my-4">
+                        <h4 class="mb-3 fw-bold">Lépések</h4>
+                        <div id="steps-list" class="mb-3"></div>
+                        <button type="button" id="add-step-btn" class="btn btn-outline-secondary btn-sm mb-4">+ Lépés hozzáadása</button>
+                        
+                        <div class="d-grid gap-2 mt-2">
+                            <button type="submit" class="btn-warning btn py-3 fw-bold text-white fs-5">MÓDOSÍTÁSOK MENTÉSE</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('edit-recipe-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('recipe-title').value.trim();
+            const description = document.getElementById('recipe-description').value.trim();
+            const categoryId = document.getElementById('recipe-category').value;
+            let image = document.getElementById('recipe-image').value.trim();
+            
+            const fileInput = document.getElementById('recipe-image-file');
+            if (fileInput && fileInput.files && fileInput.files.length > 0) {
+                const formData = new FormData(); formData.append('image', fileInput.files[0]); formData.append('action', 'upload_image');
+                try {
+                    const uploadResult = await fetch('api/api.php', { method: 'POST', body: formData });
+                    const uploadData = await uploadResult.json();
+                    if (uploadData.success) image = uploadData.path; else { alert('Hiba a kép feltöltésén'); return; }
+                } catch (err) { alert('Hiba a kép feltöltésén'); return; }
+            }
+
+            if (!title) { alert('A recept neve Kötelező!'); return; }
+
+            try {
+                // 1. Alapadatok frissítése
+                const result = await Api.call(API_ACTIONS.UPDATE_RECIPE, { recipe_id: id, user_id: user.id, title, description, category_id: categoryId, image });
+
+                if (result.success) {
+                    // 2. Töröljük a régi hozzávalókat és lépéseket
+                    await Api.call(API_ACTIONS.CLEAR_RECIPE_DETAILS, { recipe_id: id });
+
+                    // 3. Végigmegyünk a listákon és újra felvisszük
+                    const ingredientRows = document.querySelectorAll('.ingredient-row');
+                    for (const row of ingredientRows) {
+                        const selectEl = row.querySelector('.ingredient-select');
+                        let ingredientId = selectEl.value;
+                        const newRow = row.querySelector('.ingredient-new-row');
+                        const newNameInput = row.querySelector('.ingredient-new-name');
+                        const newName = newRow.classList.contains('d-none') ? '' : newNameInput.value.trim();
+                        const quantity = row.querySelector('.ingredient-quantity').value;
+                        let unit = row.querySelector('.ingredient-unit').value;
+                        const unitNewRow = row.querySelector('.unit-new-row');
+                        const newUnitNameInput = row.querySelector('.unit-new-name');
+                        const newUnitAbbrInput = row.querySelector('.unit-new-abbr');
+                        const newUnitName = unitNewRow.classList.contains('d-none') ? '' : newUnitNameInput.value.trim();
+                        const newUnitAbbr = unitNewRow.classList.contains('d-none') ? '' : newUnitAbbrInput.value.trim();
+
+                        if (unit === '__new__' && !unitNewRow.classList.contains('d-none') && newUnitName && newUnitAbbr) {
+                            const unitResult = await Api.call(API_ACTIONS.ADD_UNIT, { name: newUnitName, abbreviation: newUnitAbbr });
+                            if (unitResult.success) unit = newUnitAbbr; else unit = 'g';
+                        }
+                        if (ingredientId === '__new__' && !newRow.classList.contains('d-none')) {
+                            if (!newName || !quantity) continue;
+                            const newResult = await Api.call(API_ACTIONS.ADD_INGREDIENT, { name: newName });
+                            if (newResult.success) ingredientId = newResult.ingredient_id; else continue;
+                        }
+                        if (ingredientId && ingredientId !== '__new__' && quantity) {
+                            await Api.call(API_ACTIONS.ADD_RECIPE_INGREDIENT, { recipe_id: id, ingredient_id: ingredientId, quantity: quantity, unit: unit });
+                        }
+                    }
+
+                    const stepRows = document.querySelectorAll('.step-row');
+                    for (let i = 0; i < stepRows.length; i++) {
+                        const desc = stepRows[i].querySelector('.step-description').value;
+                        if (desc) await Api.call(API_ACTIONS.ADD_RECIPE_STEP, { recipe_id: id, step_number: i + 1, description: desc });
+                    }
+                    alert('Recept sikeresen módosítva!');
+                    window.location.hash = '#my-recipes';
+                } else { alert(result.error || 'Hiba a módosításkor'); }
+            } catch (error) { alert('Szerverhiba történt'); }
+        });
+
+        // Hozzávalók/Lépések betöltése
+        const ingredientsList = document.getElementById('ingredients-list');
+        const stepsList = document.getElementById('steps-list');
+        let ingredientCount = 0; let stepCount = 0;
+        
+        const allIngredients = await Api.call(API_ACTIONS.GET_ALL_INGREDIENTS);
+        const ingArray = Array.isArray(allIngredients) ? allIngredients : [];
+        const allUnits = await Api.call(API_ACTIONS.GET_ALL_UNITS);
+        const unitArray = Array.isArray(allUnits) ? allUnits : [];
+
+        function addIngredientRow(existingData = null) {
+            ingredientCount++;
+            const options = ingArray.map(i => `<option value="${i.id}" ${existingData && existingData.ingredient_id == i.id ? 'selected' : ''}>${i.name}</option>`).join('');
+            const unitOptions = unitArray.map(u => `<option value="${u.abbreviation}" ${existingData && existingData.unit == u.abbreviation ? 'selected' : ''}>${u.abbreviation}</option>`).join('');
+            const qty = existingData ? existingData.quantity : '';
+
+            ingredientsList.insertAdjacentHTML('beforeend', `
+                <div class="ingredient-row fade-in-up mb-3">
+                    <div class="d-flex gap-2 mb-2 align-items-center">
+                        <select class="form-control ingredient-select" style="flex: 2;" onchange="handleIngredientSelect(this)">
+                            <option value="">Válassz hozzávalót...</option>
+                            ${options}
+                            <option value="__new__">+ Új hozzávaló...</option>
+                        </select>
+                        <input type="number" class="form-control ingredient-quantity" placeholder="Mennyiség" style="width: 100px;" value="${qty}">
+                        <select class="form-control ingredient-unit" style="width: 90px;" onchange="handleUnitSelect(this)">
+                            ${unitOptions}
+                            <option value="__new__">+ Új...</option>
+                        </select>
+                        <button type="button" class="btn btn-outline-danger btn-sm remove-btn px-3">X</button>
+                    </div>
+                    <div class="ingredient-new-row d-none ps-3 border-start border-2 border-primary">
+                        <input type="text" class="form-control ingredient-new-name mb-2" placeholder="Új hozzávaló neve">
+                    </div>
+                    <div class="unit-new-row d-none ps-3 border-start border-2 border-success">
+                        <div class="d-flex gap-2">
+                            <input type="text" class="form-control unit-new-name" placeholder="Mértékegység neve" style="flex: 2;">
+                            <input type="text" class="form-control unit-new-abbr" placeholder="Rövidítés" style="width: 80px;">
+                        </div>
+                    </div>
+                </div>
+            `);
+            ingredientsList.querySelectorAll('.remove-btn').forEach(btn => btn.onclick = () => btn.parentElement.parentElement.remove());
+        }
+
+        function addStepRow(existingDesc = '') {
+            stepCount++;
+            stepsList.insertAdjacentHTML('beforeend', `
+                <div class="step-row d-flex gap-2 mb-2 fade-in-up">
+                    <span class="badge bg-secondary" style="align-self: center; font-size:1.1rem; padding: 10px 14px; border-radius:8px;">${stepCount}</span>
+                    <textarea class="form-control step-description" rows="2">${existingDesc}</textarea>
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-btn px-3">X</button>
+                </div>
+            `);
+            stepsList.querySelectorAll('.remove-btn').forEach(btn => { btn.onclick = (e) => { e.target.parentElement.remove(); reindexSteps(); }; });
+        }
+        function reindexSteps() {
+            const rows = stepsList.querySelectorAll('.step-row');
+            rows.forEach((row, i) => { row.querySelector('.badge').textContent = i + 1; });
+            stepCount = rows.length;
+        }
+
+        document.getElementById('add-ingredient-btn').onclick = () => addIngredientRow();
+        document.getElementById('add-step-btn').onclick = () => addStepRow();
+
+        // Meglévő adatok betöltése
+        if (Array.isArray(ings) && ings.length > 0) ings.forEach(ing => addIngredientRow(ing));
+        else { addIngredientRow(); addIngredientRow(); }
+
+        if (Array.isArray(steps) && steps.length > 0) steps.forEach(step => addStepRow(step.description));
+        else { addStepRow(); }
     }
 };

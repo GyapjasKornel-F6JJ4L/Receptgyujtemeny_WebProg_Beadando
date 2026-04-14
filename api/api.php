@@ -259,6 +259,37 @@ try {
             throw new Exception("Hiba a fájl mentése során! Ellenőrizd a mappa írási jogait.");
         }
     }
+
+    // 17. Recept törlése
+    elseif ($action === 'delete_recipe') {
+        $recipeId = $request['recipe_id'] ?? null;
+        $userId = $request['user_id'] ?? null;
+        if (!$recipeId || !$userId) throw new Exception("Hiányzó adatok!");
+        $result = $queryManager->deleteRecipe($recipeId, $userId);
+        echo json_encode($result);
+    }
+    
+    // 18. Recept frissítése
+    elseif ($action === 'update_recipe') {
+        $recipeId = $request['recipe_id'] ?? null;
+        $userId = $request['user_id'] ?? null;
+        $title = $request['title'] ?? '';
+        $description = $request['description'] ?? '';
+        $categoryId = $request['category_id'] ?? 1;
+        $image = $request['image'] ?? null;
+
+        if (!$recipeId || empty($title) || empty($userId)) throw new Exception("Hiányzó adatok!");
+        $result = $queryManager->updateRecipeBasic($recipeId, $userId, $title, $description, $categoryId, $image);
+        echo json_encode($result);
+    }
+
+    // 19. Recept részletek ürítése (szerkesztéshez)
+    elseif ($action === 'clear_recipe_details') {
+        $recipeId = $request['recipe_id'] ?? null;
+        if (!$recipeId) throw new Exception("Hiányzó recept ID!");
+        $result = $queryManager->clearRecipeDetails($recipeId);
+        echo json_encode($result);
+    }
     
     // Ha ismeretlen a kérés
     else {
