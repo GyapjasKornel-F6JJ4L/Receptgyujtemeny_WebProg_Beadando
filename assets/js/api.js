@@ -39,8 +39,14 @@ const Api = {
             });
 
             if (!response.ok) {
-                console.error('API HTTP hiba:', response.status);
-                return { error: 'API válasz hiba: ' + response.status };
+                try {
+                    // Megpróbáljuk kiolvasni a PHP által küldött JSON hibaüzenetet
+                    const errorData = await response.json();
+                    return { error: errorData.error || 'Hiba történt a kérés során.' };
+                } catch (e) {
+                    // Ha nem JSON érkezett, marad a status kódos hiba
+                    return { error: 'API válasz hiba: ' + response.status };
+                }
             }
 
             return await response.json();

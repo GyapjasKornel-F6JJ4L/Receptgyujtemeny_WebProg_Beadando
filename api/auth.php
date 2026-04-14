@@ -16,7 +16,15 @@ try {
         throw new Exception("Minden mezőt ki kell tölteni!");
     }
 
+    // api/auth.php - JAVÍTOTT RÉSZ
     if ($action === 'register') {
+        
+        // --- ÚJ ELLENŐRZÉS: Ha van megadva e-mail, de nem érvényes a formátuma ---
+        if ($email !== null && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new Exception("Érvénytelen e-mail cím formátum!");
+        }
+        // ------------------------------------------------------------------------
+
         $result = $queryManager->registerUser($username, $password, $email);
         echo json_encode($result);
     } 

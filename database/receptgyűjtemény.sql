@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.2
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Mar 31, 2026 at 08:16 PM
--- Server version: 10.4.11-MariaDB
--- PHP Version: 7.4.6
+-- Gép: 127.0.0.1
+-- Létrehozás ideje: 2026. Ápr 14. 11:11
+-- Kiszolgáló verziója: 10.4.32-MariaDB
+-- PHP verzió: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,24 +18,22 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `receptgyűjtemény`
+-- Adatbázis: `receptgyűjtemény`
 --
-CREATE DATABASE IF NOT EXISTS `receptgyűjtemény` DEFAULT CHARACTER SET utf8 COLLATE utf8_hungarian_ci;
-USE `receptgyűjtemény`;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `categories`
+-- Tábla szerkezet ehhez a táblához `categories`
 --
 
 CREATE TABLE `categories` (
   `id` int(11) NOT NULL,
-  `name` varchar(100) COLLATE utf8_hungarian_ci NOT NULL
+  `name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
 
 --
--- Dumping data for table `categories`
+-- A tábla adatainak kiíratása `categories`
 --
 
 INSERT INTO `categories` (`id`, `name`) VALUES
@@ -48,47 +46,16 @@ INSERT INTO `categories` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `units`
---
-
-CREATE TABLE `units` (
-  `id` int(11) NOT NULL,
-  `name` varchar(50) COLLATE utf8_hungarian_ci NOT NULL,
-  `abbreviation` varchar(20) COLLATE utf8_hungarian_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
-
---
--- Dumping data for table `units`
---
-
-INSERT INTO `units` (`id`, `name`, `abbreviation`) VALUES
-(1, 'gramm', 'g'),
-(2, 'kilogramm', 'kg'),
-(3, 'milliliter', 'ml'),
-(4, 'liter', 'l'),
-(5, 'darab', 'db'),
-(6, 'evőkanál', 'ek'),
-(7, 'teáskanál', 'tk'),
-(8, 'csipet', 'csipet'),
-(9, 'szem', 'szem'),
-(10, 'szelet', 'szelet'),
-(11, 'deciliter', 'dl'),
-(12, 'gerezd', 'gerezd'),
-(13, 'ízlásra', 'ízlásra');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `ingredients`
+-- Tábla szerkezet ehhez a táblához `ingredients`
 --
 
 CREATE TABLE `ingredients` (
   `id` int(11) NOT NULL,
-  `name` varchar(100) COLLATE utf8_hungarian_ci NOT NULL
+  `name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
 
 --
--- Dumping data for table `ingredients`
+-- A tábla adatainak kiíratása `ingredients`
 --
 
 INSERT INTO `ingredients` (`id`, `name`) VALUES
@@ -121,50 +88,56 @@ INSERT INTO `ingredients` (`id`, `name`) VALUES
 (27, 'zabpehely'),
 (28, 'méz'),
 (29, 'citrom'),
-(30, 'gomba');
+(30, 'gomba'),
+(31, 'víz'),
+(32, 'élesztő'),
+(33, 'paradicsomszósz'),
+(34, 'mozzarella sajt'),
+(35, 'olívaolaj');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `recipes`
+-- Tábla szerkezet ehhez a táblához `recipes`
 --
 
 CREATE TABLE `recipes` (
   `id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
   `category_id` int(11) DEFAULT NULL,
-  `title` varchar(255) COLLATE utf8_hungarian_ci DEFAULT NULL,
-  `description` text COLLATE utf8_hungarian_ci DEFAULT NULL,
-  `image` varchar(255) COLLATE utf8_hungarian_ci DEFAULT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `image` varchar(255) DEFAULT NULL,
   `created_at` date DEFAULT NULL,
   `first_made` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
 
 --
--- Dumping data for table `recipes`
+-- A tábla adatainak kiíratása `recipes`
 --
 
 INSERT INTO `recipes` (`id`, `user_id`, `category_id`, `title`, `description`, `image`, `created_at`, `first_made`) VALUES
-(1, 2, 1, 'Gulyásleves', 'Autentikus magyar gulyásleves marhahúsból, paprikával és burgonyával.', 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400', '2026-03-31', '2025-01-15'),
-(2, 3, 1, 'Húsleves', 'Tradicionális magyar húsleves marhahúsból zöldségekkel.', 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400', '2026-03-31', '2024-11-20'),
-(3, 4, 2, 'Paprikás csirke', 'Csirkecomb paprikás ragu tejföllel, házi csipetkével.', 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=400', '2026-03-31', '2025-02-28'),
-(4, 1, 2, 'Rántott hús', 'Sertéskaraj panírban, aranybarnára sütve.', 'https://images.unsplash.com/photo-1603073163308-9654c3fb70b5?w=400', '2026-03-31', '2024-12-05'),
-(5, 2, 3, 'Palacsinta', 'Hagyományos magyar palacsinta lekvárral és kristálycukorral.', 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400', '2026-03-31', '2025-03-10'),
-(6, 3, 3, 'Almás pite', 'Réteges almás pite fahéjjal és citrommal.', 'https://images.unsplash.com/photo-1568571780765-9276ac8b75a2?w=400', '2026-03-31', '2024-10-15'),
-(7, 4, 4, 'Görög saláta', 'Friss görög saláta paradicsommal, uborkával és fetával.', 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400', '2026-03-31', '2025-04-01'),
-(8, 1, 4, 'Uborkasaláta', 'Ecetes uborka fokhagymával és kapribogysóval.', 'https://images.unsplash.com/photo-1582738411706-bfc8e691d1c2?w=400', '2026-03-31', '2024-09-20'),
-(9, 2, 5, 'Rántotta', 'Tojás rántotta friss petrezselyemmel.', 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400', '2026-03-31', '2025-01-25'),
-(10, 3, 5, 'Zabkása', 'Meleg zabkása mézzel és gyümölcsökkel.', 'https://images.unsplash.com/photo-1517673132405-a56a62b18caf?w=400', '2026-03-31', '2024-08-10'),
-(11, 1, 1, 'Csirkeaprólék leves', 'Csirkeaprólék leves zöldségekkel és citrommal.', 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400', '2026-04-01', '2025-02-15'),
-(12, 2, 2, 'Bolognai spagetti', 'Olasz stílusú darált hús paradicsom szósszal.', 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400', '2026-04-01', '2024-12-20'),
-(13, 3, 2, 'Sült csirkecomb', 'Sült csirkecomb fokhagymás vajmártással.', 'https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=400', '2026-04-01', '2025-03-25'),
-(14, 4, 3, 'Túrós pite', 'Túrós pite mazsolás és vaníliás töltelékkel.', 'https://images.unsplash.com/photo-1568571780765-9276ac8b75a2?w=400', '2026-04-01', '2024-11-10'),
-(15, 1, 4, 'Ceasar saláta', 'Ceasar saláta csirkemellel és parmezánnal.', 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400', '2026-04-01', '2025-04-05');
+(1, 2, 1, 'Gulyásleves', 'Autentikus magyar gulyásleves marhahúsból, paprikával és burgonyával.', 'uploads/gulyasleves.webp', '2026-03-31', '2025-01-15'),
+(2, 3, 1, 'Húsleves', 'Tradicionális magyar húsleves marhahúsból zöldségekkel.', 'uploads/husleves.webp', '2026-03-31', '2024-11-20'),
+(3, 4, 2, 'Paprikás csirke', 'Csirkecomb paprikás ragu tejföllel, házi csipetkével.', 'uploads/paprikas-csirke.jpg', '2026-03-31', '2025-02-28'),
+(4, 1, 2, 'Rántott hús', 'Sertéskaraj panírban, aranybarnára sütve.', 'uploads/rantott-hus.webp', '2026-03-31', '2024-12-05'),
+(5, 2, 3, 'Palacsinta', 'Hagyományos magyar palacsinta lekvárral és kristálycukorral.', 'uploads/palacsinta.jpg', '2026-03-31', '2025-03-10'),
+(6, 3, 3, 'Almás pite', 'Réteges almás pite fahéjjal és citrommal.', 'uploads/almaspite.webp', '2026-03-31', '2024-10-15'),
+(7, 4, 4, 'Görög saláta', 'Friss görög saláta paradicsommal, uborkával és fetával.', 'uploads/gorog-salata.jpg', '2026-03-31', '2025-04-01'),
+(8, 1, 4, 'Uborkasaláta', 'Ecetes uborka fokhagymával és kapribogysóval.', 'uploads/uborkasalata.jpeg', '2026-03-31', '2024-09-20'),
+(9, 2, 5, 'Rántotta', 'Tojás rántotta friss petrezselyemmel.', 'uploads/rantotta.jpeg', '2026-03-31', '2025-01-25'),
+(10, 3, 5, 'Zabkása', 'Meleg zabkása mézzel és gyümölcsökkel.', 'uploads/zabkasa.jpg', '2026-03-31', '2024-08-10'),
+(11, 1, 1, 'Csirkeaprólék leves', 'Csirkeaprólék leves zöldségekkel és citrommal.', 'uploads/csirkeaprolek-leves.jpg', '2026-04-01', '2025-02-15'),
+(12, 2, 2, 'Bolognai spagetti', 'Olasz stílusú darált hús paradicsom szósszal.', 'uploads/bolognai.jpg', '2026-04-01', '2024-12-20'),
+(13, 3, 2, 'Sült csirkecomb', 'Sült csirkecomb fokhagymás vajmártással.', 'uploads/sult-csirkecomb.jpg', '2026-04-01', '2025-03-25'),
+(14, 4, 3, 'Túrós pite', 'Túrós pite mazsolás és vaníliás töltelékkel.', 'uploads/turospite.jpg', '2026-04-01', '2024-11-10'),
+(15, 1, 4, 'Ceasar saláta', 'Ceasar saláta csirkemellel és parmezánnal.', 'uploads/ceasar-salata.jpg', '2026-04-01', '2025-04-05'),
+(16, 7, 2, 'Házi Margherita Pizza', 'Klasszikus, vékony tésztás olasz pizza paradicsomszósszal és friss mozzarellával.', 'uploads/recipe_69ddfe6d9da75.jpg', '2026-04-14', NULL);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `recipe_ingredients`
+-- Tábla szerkezet ehhez a táblához `recipe_ingredients`
 --
 
 CREATE TABLE `recipe_ingredients` (
@@ -172,98 +145,105 @@ CREATE TABLE `recipe_ingredients` (
   `recipe_id` int(11) DEFAULT NULL,
   `ingredient_id` int(11) DEFAULT NULL,
   `quantity` decimal(10,2) DEFAULT NULL,
-  `unit` varchar(50) COLLATE utf8_hungarian_ci DEFAULT NULL
+  `unit` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
 
 --
--- Dumping data for table `recipe_ingredients`
+-- A tábla adatainak kiíratása `recipe_ingredients`
 --
 
 INSERT INTO `recipe_ingredients` (`id`, `recipe_id`, `ingredient_id`, `quantity`, `unit`) VALUES
-(1, 1, 1, '500.00', 'g'),
-(2, 1, 16, '1.00', 'db'),
-(3, 1, 18, '3.00', 'db'),
-(4, 1, 20, '1.00', 'db'),
-(5, 1, 10, '5.00', 'g'),
-(6, 1, 9, '10.00', 'g'),
-(7, 2, 1, '700.00', 'g'),
-(8, 2, 18, '2.00', 'db'),
-(9, 2, 19, '2.00', 'db'),
-(10, 2, 17, '3.00', 'gerezd'),
-(11, 2, 9, '15.00', 'g'),
-(12, 3, 4, '500.00', 'g'),
-(13, 3, 16, '1.00', 'db'),
-(14, 3, 14, '200.00', 'ml'),
-(15, 3, 20, '2.00', 'db'),
-(16, 3, 10, '3.00', 'g'),
-(17, 4, 2, '500.00', 'g'),
-(18, 4, 6, '2.00', 'db'),
-(19, 4, 7, '100.00', 'g'),
-(20, 4, 11, '300.00', 'ml'),
-(21, 4, 9, '5.00', 'g'),
-(22, 5, 7, '200.00', 'g'),
-(23, 5, 6, '2.00', 'db'),
-(24, 5, 13, '300.00', 'ml'),
-(25, 5, 8, '30.00', 'g'),
-(26, 6, 7, '300.00', 'g'),
-(27, 6, 24, '3.00', 'db'),
-(28, 6, 6, '100.00', 'g'),
-(29, 6, 8, '150.00', 'g'),
-(30, 6, 29, '1.00', 'db'),
-(31, 7, 21, '2.00', 'db'),
-(32, 7, 25, '1.00', 'db'),
-(33, 7, 15, '100.00', 'g'),
-(34, 7, 11, '50.00', 'ml'),
-(35, 7, 9, '3.00', 'g'),
-(36, 8, 25, '2.00', 'db'),
-(37, 8, 9, '5.00', 'g'),
-(38, 8, 29, '30.00', 'ml'),
-(39, 9, 6, '3.00', 'db'),
-(40, 9, 12, '10.00', 'g'),
-(41, 9, 9, '2.00', 'g'),
-(42, 10, 27, '50.00', 'g'),
-(43, 10, 13, '200.00', 'ml'),
-(44, 10, 28, '20.00', 'g'),
-(45, 11, 4, '400.00', 'g'),
-(46, 11, 19, '2.00', 'db'),
-(47, 11, 18, '2.00', 'db'),
-(48, 11, 16, '1.00', 'db'),
-(49, 11, 29, '1.00', 'db'),
-(50, 12, 2, '400.00', 'g'),
-(51, 12, 23, '400.00', 'g'),
-(52, 12, 21, '400.00', 'g'),
-(53, 12, 16, '1.00', 'db'),
-(54, 12, 9, '10.00', 'g'),
-(55, 13, 3, '600.00', 'g'),
-(56, 13, 12, '50.00', 'g'),
-(57, 13, 17, '4.00', 'gerezd'),
-(58, 13, 9, '5.00', 'g'),
-(59, 14, 7, '250.00', 'g'),
-(60, 14, 15, '300.00', 'g'),
-(61, 14, 6, '3.00', 'db'),
-(62, 14, 13, '200.00', 'ml'),
-(63, 14, 8, '100.00', 'g'),
-(64, 15, 3, '300.00', 'g'),
-(65, 15, 21, '2.00', 'db'),
-(66, 15, 25, '1.00', 'db'),
-(67, 15, 7, '50.00', 'g'),
-(68, 15, 11, '60.00', 'ml');
+(1, 1, 1, 500.00, 'g'),
+(2, 1, 16, 1.00, 'db'),
+(3, 1, 18, 3.00, 'db'),
+(4, 1, 20, 1.00, 'db'),
+(5, 1, 10, 5.00, 'g'),
+(6, 1, 9, 10.00, 'g'),
+(7, 2, 1, 700.00, 'g'),
+(8, 2, 18, 2.00, 'db'),
+(9, 2, 19, 2.00, 'db'),
+(10, 2, 17, 3.00, 'gerezd'),
+(11, 2, 9, 15.00, 'g'),
+(12, 3, 4, 500.00, 'g'),
+(13, 3, 16, 1.00, 'db'),
+(14, 3, 14, 200.00, 'ml'),
+(15, 3, 20, 2.00, 'db'),
+(16, 3, 10, 3.00, 'g'),
+(17, 4, 2, 500.00, 'g'),
+(18, 4, 6, 2.00, 'db'),
+(19, 4, 7, 100.00, 'g'),
+(20, 4, 11, 300.00, 'ml'),
+(21, 4, 9, 5.00, 'g'),
+(22, 5, 7, 200.00, 'g'),
+(23, 5, 6, 2.00, 'db'),
+(24, 5, 13, 300.00, 'ml'),
+(25, 5, 8, 30.00, 'g'),
+(26, 6, 7, 300.00, 'g'),
+(27, 6, 24, 3.00, 'db'),
+(28, 6, 6, 100.00, 'g'),
+(29, 6, 8, 150.00, 'g'),
+(30, 6, 29, 1.00, 'db'),
+(31, 7, 21, 2.00, 'db'),
+(32, 7, 25, 1.00, 'db'),
+(33, 7, 15, 100.00, 'g'),
+(34, 7, 11, 50.00, 'ml'),
+(35, 7, 9, 3.00, 'g'),
+(36, 8, 25, 2.00, 'db'),
+(37, 8, 9, 5.00, 'g'),
+(38, 8, 29, 30.00, 'ml'),
+(39, 9, 6, 3.00, 'db'),
+(40, 9, 12, 10.00, 'g'),
+(41, 9, 9, 2.00, 'g'),
+(42, 10, 27, 50.00, 'g'),
+(43, 10, 13, 200.00, 'ml'),
+(44, 10, 28, 20.00, 'g'),
+(45, 11, 4, 400.00, 'g'),
+(46, 11, 19, 2.00, 'db'),
+(47, 11, 18, 2.00, 'db'),
+(48, 11, 16, 1.00, 'db'),
+(49, 11, 29, 1.00, 'db'),
+(50, 12, 2, 400.00, 'g'),
+(51, 12, 23, 400.00, 'g'),
+(52, 12, 21, 400.00, 'g'),
+(53, 12, 16, 1.00, 'db'),
+(54, 12, 9, 10.00, 'g'),
+(55, 13, 3, 600.00, 'g'),
+(56, 13, 12, 50.00, 'g'),
+(57, 13, 17, 4.00, 'gerezd'),
+(58, 13, 9, 5.00, 'g'),
+(59, 14, 7, 250.00, 'g'),
+(60, 14, 15, 300.00, 'g'),
+(61, 14, 6, 3.00, 'db'),
+(62, 14, 13, 200.00, 'ml'),
+(63, 14, 8, 100.00, 'g'),
+(64, 15, 3, 300.00, 'g'),
+(65, 15, 21, 2.00, 'db'),
+(66, 15, 25, 1.00, 'db'),
+(67, 15, 7, 50.00, 'g'),
+(68, 15, 11, 60.00, 'ml'),
+(69, 16, 7, 500.00, 'g'),
+(70, 16, 31, 300.00, 'ml'),
+(71, 16, 32, 10.00, 'g'),
+(72, 16, 9, 10.00, 'g'),
+(73, 16, 33, 200.00, 'g'),
+(74, 16, 34, 250.00, 'g'),
+(75, 16, 35, 2.00, 'ek');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `steps`
+-- Tábla szerkezet ehhez a táblához `steps`
 --
 
 CREATE TABLE `steps` (
   `id` int(11) NOT NULL,
   `recipe_id` int(11) DEFAULT NULL,
   `step_number` int(11) DEFAULT NULL,
-  `description` text COLLATE utf8_hungarian_ci DEFAULT NULL
+  `description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
 
 --
--- Dumping data for table `steps`
+-- A tábla adatainak kiíratása `steps`
 --
 
 INSERT INTO `steps` (`id`, `recipe_id`, `step_number`, `description`) VALUES
@@ -343,53 +323,88 @@ INSERT INTO `steps` (`id`, `recipe_id`, `step_number`, `description`) VALUES
 (74, 15, 2, 'Serpenyőben megsütjük, majd félretesszük.'),
 (75, 15, 3, 'A saláta alapanyagait összeforgatjuk.'),
 (76, 15, 4, 'Rátesszük a csirkét és parmezánt.'),
-(77, 15, 5, 'Crutonnal és öntettel tálaljuk.');
+(77, 15, 5, 'Crutonnal és öntettel tálaljuk.'),
+(78, 16, 1, 'Tésztát bedagasztjuk (liszt, víz, élesztő, só, olaj).'),
+(79, 16, 2, 'A tésztát meleg helyen duplájára kelesztjük. '),
+(80, 16, 3, 'Kinyújtjuk a tésztát vékony, kerek formára. '),
+(81, 16, 4, 'Megkenjük paradicsomszósszal és rátesszük a tépkedett mozzarellát. '),
+(82, 16, 5, 'Forró sütőben ropogósra sütjük.');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Tábla szerkezet ehhez a táblához `units`
+--
+
+CREATE TABLE `units` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `abbreviation` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
+
+--
+-- A tábla adatainak kiíratása `units`
+--
+
+INSERT INTO `units` (`id`, `name`, `abbreviation`) VALUES
+(1, 'gramm', 'g'),
+(2, 'kilogramm', 'kg'),
+(3, 'milliliter', 'ml'),
+(4, 'liter', 'l'),
+(5, 'darab', 'db'),
+(6, 'evőkanál', 'ek'),
+(7, 'teáskanál', 'tk'),
+(8, 'csipet', 'csipet'),
+(9, 'szem', 'szem'),
+(10, 'szelet', 'szelet'),
+(11, 'deciliter', 'dl'),
+(12, 'gerezd', 'gerezd'),
+(13, 'ízlásra', 'ízlásra');
+
+-- --------------------------------------------------------
+
+--
+-- Tábla szerkezet ehhez a táblához `users`
 --
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
-  `username` varchar(50) COLLATE utf8_hungarian_ci DEFAULT NULL,
-  `email` varchar(100) COLLATE utf8_hungarian_ci DEFAULT NULL,
-  `password` varchar(255) COLLATE utf8_hungarian_ci DEFAULT NULL,
+  `username` varchar(50) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
 
 --
--- Dumping data for table `users`
+-- A tábla adatainak kiíratása `users`
 --
 
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `created_at`) VALUES
 (1, 'kockas_pista', 'pista@lol.hu', '$2y$10$mhzzdt2TrJ.UDdYiD0NEKu7u9PN9wyLUvJyNC8bcTsPA6Jo14n.QW', '2026-03-31 18:12:14'),
 (2, 'suteskiraly69', 'kiraly@chef.hu', '$2y$10$mhzzdt2TrJ.UDdYiD0NEKu7u9PN9wyLUvJyNC8bcTsPA6Jo14n.QW', '2026-03-31 18:12:14'),
 (3, 'tejfol_nindzsa', 'nindzsa@konyha.hu', '$2y$10$mhzzdt2TrJ.UDdYiD0NEKu7u9PN9wyLUvJyNC8bcTsPA6Jo14n.QW', '2026-03-31 18:12:14'),
-(4, 'rantotthus_isten', 'hus@mennyei.hu', '$2y$10$mhzzdt2TrJ.UDdYiD0NEKu7u9PN9wyLUvJyNC8bcTsPA6Jo14n.QW', '2026-03-31 18:12:14');
+(4, 'rantotthus_isten', 'hus@mennyei.hu', '$2y$10$mhzzdt2TrJ.UDdYiD0NEKu7u9PN9wyLUvJyNC8bcTsPA6Jo14n.QW', '2026-03-31 18:12:14'),
+(6, 'admin2', NULL, '$2y$10$SjUPkYPXqFHEG7WMgcTR0OPdT0x3l6N/1PT93qYt8.Xm6A6hZel4S', '2026-04-14 08:28:01'),
+(7, 'admin3', NULL, '$2y$10$JDUaAHEerS2A.Vsq.qjQierTb3z2D/fXqO1JwSsrJPxAUBCp2wXE6', '2026-04-14 08:32:54');
 
 --
--- Indexes for dumped tables
+-- Indexek a kiírt táblákhoz
 --
 
 --
--- Indexes for table `categories`
+-- A tábla indexei `categories`
 --
-ALTER TABLE `categories` ADD PRIMARY KEY (`id`);
+ALTER TABLE `categories`
+  ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `ingredients`
+-- A tábla indexei `ingredients`
 --
-ALTER TABLE `ingredients` ADD PRIMARY KEY (`id`);
+ALTER TABLE `ingredients`
+  ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `units`
---
-ALTER TABLE `units` ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `recipes`
+-- A tábla indexei `recipes`
 --
 ALTER TABLE `recipes`
   ADD PRIMARY KEY (`id`),
@@ -397,7 +412,7 @@ ALTER TABLE `recipes`
   ADD KEY `category_id` (`category_id`);
 
 --
--- Indexes for table `recipe_ingredients`
+-- A tábla indexei `recipe_ingredients`
 --
 ALTER TABLE `recipe_ingredients`
   ADD PRIMARY KEY (`id`),
@@ -405,14 +420,20 @@ ALTER TABLE `recipe_ingredients`
   ADD KEY `ingredient_id` (`ingredient_id`);
 
 --
--- Indexes for table `steps`
+-- A tábla indexei `steps`
 --
 ALTER TABLE `steps`
   ADD PRIMARY KEY (`id`),
   ADD KEY `recipe_id` (`recipe_id`);
 
 --
--- Indexes for table `users`
+-- A tábla indexei `units`
+--
+ALTER TABLE `units`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- A tábla indexei `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
@@ -420,71 +441,71 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `email` (`email`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- A kiírt táblák AUTO_INCREMENT értéke
 --
 
 --
--- AUTO_INCREMENT for table `categories`
+-- AUTO_INCREMENT a táblához `categories`
 --
 ALTER TABLE `categories`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT for table `ingredients`
+-- AUTO_INCREMENT a táblához `ingredients`
 --
 ALTER TABLE `ingredients`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
--- AUTO_INCREMENT for table `units`
+-- AUTO_INCREMENT a táblához `recipes`
+--
+ALTER TABLE `recipes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT a táblához `recipe_ingredients`
+--
+ALTER TABLE `recipe_ingredients`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
+
+--
+-- AUTO_INCREMENT a táblához `steps`
+--
+ALTER TABLE `steps`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
+
+--
+-- AUTO_INCREMENT a táblához `units`
 --
 ALTER TABLE `units`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
--- AUTO_INCREMENT for table `recipes`
---
-ALTER TABLE `recipes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
-
---
--- AUTO_INCREMENT for table `recipe_ingredients`
---
-ALTER TABLE `recipe_ingredients`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
-
---
--- AUTO_INCREMENT for table `steps`
---
-ALTER TABLE `steps`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
-
---
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT a táblához `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- Constraints for dumped tables
+-- Megkötések a kiírt táblákhoz
 --
 
 --
--- Constraints for table `recipes`
+-- Megkötések a táblához `recipes`
 --
 ALTER TABLE `recipes`
   ADD CONSTRAINT `recipes_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   ADD CONSTRAINT `recipes_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`);
 
 --
--- Constraints for table `recipe_ingredients`
+-- Megkötések a táblához `recipe_ingredients`
 --
 ALTER TABLE `recipe_ingredients`
   ADD CONSTRAINT `recipe_ingredients_ibfk_1` FOREIGN KEY (`recipe_id`) REFERENCES `recipes` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `recipe_ingredients_ibfk_2` FOREIGN KEY (`ingredient_id`) REFERENCES `ingredients` (`id`);
 
 --
--- Constraints for table `steps`
+-- Megkötések a táblához `steps`
 --
 ALTER TABLE `steps`
   ADD CONSTRAINT `steps_ibfk_1` FOREIGN KEY (`recipe_id`) REFERENCES `recipes` (`id`) ON DELETE CASCADE;

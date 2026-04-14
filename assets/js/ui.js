@@ -75,9 +75,17 @@ const UI = {
                 return;
             }
 
+            if (email) {
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(email)) {
+                    alert('Kérlek, egy érvényes e-mail címet adj meg (pl. minta@email.hu)!');
+                    return; 
+                }
+            }
+
             Auth.register(username, password, email);
         });
-    },
+    }, // <-- EZ A LEZÁRÁS HIÁNYZOTT!
 
     // --- 3. FŐOLDAL ---
     renderHome: async () => {
@@ -130,7 +138,7 @@ const UI = {
             const listContainer = document.getElementById('recipe-list');
             const loading = document.getElementById('loading');
             const noRecipes = document.getElementById('no-recipes');
-            
+
             if (loading) loading.classList.remove('d-none');
             if (noRecipes) noRecipes.classList.add('d-none');
             listContainer.innerHTML = '';
@@ -138,9 +146,9 @@ const UI = {
             try {
                 let data;
                 if (currentSearch || (currentCategory && currentCategory !== 'all')) {
-                    data = await Api.call(API_ACTIONS.SEARCH_RECIPES, { 
-                        search: currentSearch, 
-                        category_id: currentCategory 
+                    data = await Api.call(API_ACTIONS.SEARCH_RECIPES, {
+                        search: currentSearch,
+                        category_id: currentCategory
                     });
                 } else {
                     data = await Api.call(API_ACTIONS.GET_RECIPES);
@@ -259,7 +267,7 @@ const UI = {
             const listContainer = document.getElementById('my-recipe-list');
             const loading = document.getElementById('my-loading');
             const noRecipes = document.getElementById('my-no-recipes');
-            
+
             if (loading) loading.classList.remove('d-none');
             if (noRecipes) noRecipes.classList.add('d-none');
             listContainer.innerHTML = '';
@@ -267,8 +275,8 @@ const UI = {
             try {
                 let data;
                 if (currentSearch || (currentCategory && currentCategory !== 'all')) {
-                    data = await Api.call(API_ACTIONS.SEARCH_RECIPES, { 
-                        search: currentSearch, 
+                    data = await Api.call(API_ACTIONS.SEARCH_RECIPES, {
+                        search: currentSearch,
                         category_id: currentCategory,
                         user_id: user.id
                     });
@@ -324,11 +332,11 @@ const UI = {
         const img = recipe.image || placeholderImg;
         const title = recipe.title || 'Ismeretlen recept';
         const desc = recipe.description || 'Leírás nem elérhető.';
-        
+
         let dotClass = 'bg-secondary';
-        if(recipe.type === "Főétel" || recipe.type === "Főételek") dotClass = 'dot-foetel';
-        if(recipe.type === "Desszert" || recipe.type === "Desszertek") dotClass = 'dot-desszert';
-        if(recipe.type === "Levesek" || recipe.type === "Előétel") dotClass = 'dot-leves';
+        if (recipe.type === "Főétel" || recipe.type === "Főételek") dotClass = 'dot-foetel';
+        if (recipe.type === "Desszert" || recipe.type === "Desszertek") dotClass = 'dot-desszert';
+        if (recipe.type === "Levesek" || recipe.type === "Előétel") dotClass = 'dot-leves';
 
         const animationDelay = (index * 0.1) + 's';
 
@@ -428,15 +436,15 @@ const UI = {
             const title = document.getElementById('recipe-title').value.trim();
             const description = document.getElementById('recipe-description').value.trim();
             const categoryId = document.getElementById('recipe-category').value;
-            
+
             let image = document.getElementById('recipe-image').value.trim();
-            
+
             const fileInput = document.getElementById('recipe-image-file');
             if (fileInput && fileInput.files && fileInput.files.length > 0) {
                 const formData = new FormData();
                 formData.append('image', fileInput.files[0]);
                 formData.append('action', 'upload_image');
-                
+
                 try {
                     const uploadResult = await fetch('api/api.php', {
                         method: 'POST',
@@ -476,28 +484,28 @@ const UI = {
 
                     // --- JAVÍTOTT ÉS BIZTOSÍTOTT HOZZÁVALÓ FELDOLGOZÁS ---
                     const ingredientRows = document.querySelectorAll('.ingredient-row');
-                    
+
                     for (const row of ingredientRows) {
                         const selectEl = row.querySelector('.ingredient-select');
                         let ingredientId = selectEl.value;
-                        
+
                         const newRow = row.querySelector('.ingredient-new-row');
                         const newNameInput = row.querySelector('.ingredient-new-name');
                         const newName = newRow.classList.contains('d-none') ? '' : newNameInput.value.trim();
-                        
+
                         const quantity = row.querySelector('.ingredient-quantity').value;
                         let unit = row.querySelector('.ingredient-unit').value;
-                        
+
                         const unitNewRow = row.querySelector('.unit-new-row');
                         const newUnitNameInput = row.querySelector('.unit-new-name');
                         const newUnitAbbrInput = row.querySelector('.unit-new-abbr');
                         const newUnitName = unitNewRow.classList.contains('d-none') ? '' : newUnitNameInput.value.trim();
                         const newUnitAbbr = unitNewRow.classList.contains('d-none') ? '' : newUnitAbbrInput.value.trim();
-                        
+
                         if (unit === '__new__' && !unitNewRow.classList.contains('d-none') && newUnitName && newUnitAbbr) {
-                            const unitResult = await Api.call(API_ACTIONS.ADD_UNIT, { 
-                                name: newUnitName, 
-                                abbreviation: newUnitAbbr 
+                            const unitResult = await Api.call(API_ACTIONS.ADD_UNIT, {
+                                name: newUnitName,
+                                abbreviation: newUnitAbbr
                             });
                             if (unitResult.success && unitResult.unit_id) {
                                 unit = newUnitAbbr;
@@ -506,7 +514,7 @@ const UI = {
                                 unit = 'g';
                             }
                         }
-                        
+
                         // HA ÚJ HOZZÁVALÓT AKARUNK FELVINNI
                         if (ingredientId === '__new__' && !newRow.classList.contains('d-none')) {
                             if (!newName) {
@@ -520,15 +528,15 @@ const UI = {
 
                             // Kérjük meg a szervert, hogy mentse el az új hozzávalót
                             const newResult = await Api.call(API_ACTIONS.ADD_INGREDIENT, { name: newName });
-                            
+
                             if (newResult.success && newResult.ingredient_id) {
-                                ingredientId = newResult.ingredient_id; // Sikerült, megkaptuk az új ID-t!
+                                ingredientId = newResult.ingredient_id; 
                             } else {
                                 alert(`Hiba a(z) "${newName}" mentésekor a szerveren: ` + (newResult.error || 'Ismeretlen hiba'));
-                                continue; 
+                                continue;
                             }
                         }
-                        
+
                         // HA MEGVAN AZ ID (akár régi, akár frissen mentett) ÉS VAN MENNYISÉG, CSATOLJUK!
                         if (ingredientId && ingredientId !== '__new__' && quantity) {
                             const linkResult = await Api.call(API_ACTIONS.ADD_RECIPE_INGREDIENT, {
@@ -576,11 +584,11 @@ const UI = {
 
         const allIngredients = await Api.call(API_ACTIONS.GET_ALL_INGREDIENTS);
         const ingArray = Array.isArray(allIngredients) ? allIngredients : [];
-        
+
         const allUnits = await Api.call(API_ACTIONS.GET_ALL_UNITS);
         const unitArray = Array.isArray(allUnits) ? allUnits : [];
-        
-        window.handleIngredientSelect = function(select) {
+
+        window.handleIngredientSelect = function (select) {
             const row = select.closest('.ingredient-row');
             const newRow = row.querySelector('.ingredient-new-row');
             const newInput = row.querySelector('.ingredient-new-name');
@@ -594,8 +602,8 @@ const UI = {
                 newInput.required = false;
             }
         };
-        
-        window.handleUnitSelect = function(select) {
+
+        window.handleUnitSelect = function (select) {
             const row = select.closest('.ingredient-row');
             const newRow = row.querySelector('.unit-new-row');
             const newInput = row.querySelector('.unit-new-name');
@@ -615,7 +623,7 @@ const UI = {
             ingredientCount++;
             const options = ingArray.map(i => `<option value="${i.id}">${i.name}</option>`).join('');
             const unitOptions = unitArray.map(u => `<option value="${u.abbreviation}">${u.abbreviation}</option>`).join('');
-            
+
             ingredientsList.insertAdjacentHTML('beforeend', `
                 <div class="ingredient-row fade-in-up mb-3">
                     <div class="d-flex gap-2 mb-2 align-items-center">
@@ -713,19 +721,19 @@ const UI = {
         else if (categoryName === "Előétel" || categoryName === "Levesek") placeholderImg = 'uploads/gulyasleves.webp';
 
         const imgUrl = data.image || placeholderImg;
-        
+
         let dotClass = 'bg-secondary';
-        if(categoryName === "Főétel" || categoryName === "Főételek") dotClass = 'dot-foetel';
-        if(categoryName === "Desszert" || categoryName === "Desszertek") dotClass = 'dot-desszert';
-        if(categoryName === "Levesek" || categoryName === "Előétel") dotClass = 'dot-leves';
+        if (categoryName === "Főétel" || categoryName === "Főételek") dotClass = 'dot-foetel';
+        if (categoryName === "Desszert" || categoryName === "Desszertek") dotClass = 'dot-desszert';
+        if (categoryName === "Levesek" || categoryName === "Előétel") dotClass = 'dot-leves';
 
         const badgeHtml = `<span class="badge-modern"><span class="dot ${dotClass}"></span>${categoryName}</span>`;
 
         const recipeIdNum = parseInt(id, 10);
-        
+
         const ings = await Api.call('get_recipe_ingredients', { recipe_id: recipeIdNum });
         const ingsArray = Array.isArray(ings) ? ings : [];
-        
+
         const steps = await Api.call('get_recipe_steps', { recipe_id: recipeIdNum });
         const stepsArray = Array.isArray(steps) ? steps : [];
 
