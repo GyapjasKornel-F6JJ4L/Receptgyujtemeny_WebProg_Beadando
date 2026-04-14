@@ -79,7 +79,7 @@ const UI = {
                 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailPattern.test(email)) {
                     alert('Kérlek, egy érvényes e-mail címet adj meg (pl. minta@email.hu)!');
-                    return; 
+                    return;
                 }
             }
 
@@ -343,7 +343,7 @@ const UI = {
         return `
             <div class="col-md-6 col-lg-4 fade-in-up" style="animation-delay: ${animationDelay};">
                 <div class="recipe-card" onclick="window.location.hash='#recipe/${id}'">
-                    <div class="recipe-image-wrapper" style="background-color: #e2e8f0;">
+                    <div class="recipe-image-wrapper" style="background-color: #e2e8f0; height: 220px; width: 100%; overflow: hidden;">
                         <img src="${img}" alt="${title}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.opacity='0'">
                     </div>
                     <div class="card-body p-4 d-flex flex-column">
@@ -530,7 +530,7 @@ const UI = {
                             const newResult = await Api.call(API_ACTIONS.ADD_INGREDIENT, { name: newName });
 
                             if (newResult.success && newResult.ingredient_id) {
-                                ingredientId = newResult.ingredient_id; 
+                                ingredientId = newResult.ingredient_id;
                             } else {
                                 alert(`Hiba a(z) "${newName}" mentésekor a szerveren: ` + (newResult.error || 'Ismeretlen hiba'));
                                 continue;
